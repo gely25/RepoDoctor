@@ -97,3 +97,9 @@ class ModuleForm(ModelForm):
             )
         
         return icon
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        exclude_apps = ['admin', 'auth', 'contenttypes', 'sessions', 'log']
+        self.fields['permissions'].queryset = self.fields['permissions'].queryset.exclude(
+        content_type__app_label__in=exclude_apps
+        )

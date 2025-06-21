@@ -39,6 +39,17 @@ menu5, created = Menu.objects.get_or_create(
     defaults={'icon': 'bi bi-shield-lock', 'order': 5}
 )
 
+
+# Menú Gestión Médica con get_or_create
+menu6, created = Menu.objects.get_or_create(
+    name='Gestión Médica',
+    defaults={'icon': 'bi bi-shield-lock', 'order': 6}
+    
+)
+
+
+
+
 # ============================================================================
 # CREACIÓN DE MÓDULOS
 # ============================================================================
@@ -68,7 +79,14 @@ modules = [
            description='Configuración general del sistema', icon='fas fa-cogs', order=2),
     Module(url='reportes/', name='Reportes', menu=menu3,
            description='Generación de reportes y estadísticas', icon='fas fa-chart-bar', order=3),
+    
+
 ]
+
+
+
+
+
 
 created_modules = Module.objects.bulk_create(modules)
 module1, module2, module3, module4, module5, module6, module7, module8, module9 = created_modules
@@ -115,6 +133,57 @@ module13, created = Module.objects.get_or_create(
         'order': 4
     }
 )
+
+
+
+
+# Módulos adicionales para Gestión Médica con get_or_create
+module14, created = Module.objects.get_or_create(
+    url='core/cargo_list/',
+    name='Cargos',
+    menu=menu6,
+    defaults={
+        'description': 'Administración de Cargos',
+        'icon': 'fas fa-bars',
+        'order': 1
+    }
+)
+
+module15, created = Module.objects.get_or_create(
+    url='core/especialidad_list/',
+    name='Módulos',
+    menu=menu6,
+    defaults={
+        'description': 'Administración de Especialidades',
+        'icon': 'fas fa-cubes',
+        'order': 2
+    }
+)
+module16, created = Module.objects.get_or_create(
+    url='security/doctor_list/',
+    name='Doctores',
+    menu=menu6,
+    defaults={
+        'description': 'Administración de Doctores',
+        'icon': 'fas fa-user-shield',
+        'order': 3
+    }
+)
+module17, created = Module.objects.get_or_create(
+    url='security/empleado_list/',
+    name='Empleados',
+    menu=menu6,
+    defaults={
+        'description': 'Administración de Empleados',
+        'icon': 'fas fa-users-cog',
+        'order': 4
+    }
+)
+
+
+
+
+
 
 # ============================================================================
 # CREACIÓN DE USUARIOS
@@ -187,6 +256,24 @@ menu_ct = ContentType.objects.get(app_label='security', model='menu')
 module_ct = ContentType.objects.get(app_label='security', model='module')
 user_ct = ContentType.objects.get(app_label='security', model='user')  # Cambié usuario_ct por user_ct
 group_module_permission_ct = ContentType.objects.get(app_label='security', model='groupmodulepermission')
+
+
+
+#contentTypes para modelos de Gestion médica
+
+cargo_ct= ContentType.objects.get(app_label= 'core', model= 'cargo')
+especialidad_ct= ContentType.objects.get(app_label= 'core', model= 'especialidadmedica')
+doctor_ct= ContentType.objects.get(app_label= 'core', model= 'doctor')
+empleado_ct= ContentType.objects.get(app_label= 'core', model= 'empleado')
+tiposangre_ct= ContentType.objects.get(app_label= 'core', model= 'tiposangre')
+paciente_ct= ContentType.objects.get(app_label= 'core', model= 'paciente')
+marcamedicamento_ct= ContentType.objects.get(app_label= 'core', model= 'marcamedicamento')
+tipomedicamento_ct= ContentType.objects.get(app_label= 'core', model= 'tipomedicamento')
+medicamento_ct= ContentType.objects.get(app_label= 'core', model= 'medicamento')
+tipogasto_ct= ContentType.objects.get(app_label= 'core', model= 'tipogasto')
+gastomensual_ct= ContentType.objects.get(app_label= 'core', model= 'gastomensual')
+diagnostico_ct=ContentType.objects.get(app_label= 'core', model= 'diagnostico')
+fotopaciente_ct=ContentType.objects.get(app_label= 'core', model= 'fotopaciente')
 
 # Permisos de Menu
 menu_view = Permission.objects.get_or_create(
@@ -275,6 +362,146 @@ group_module_permission_delete = Permission.objects.get_or_create(
     defaults={'name': 'Can delete GroupModulePermission'}
 )[0]
 
+
+
+# Permisos de GroupModulePermission
+group_module_permission_view = Permission.objects.get_or_create(
+    codename='view_groupmodulepermission',
+    content_type=group_module_permission_ct,
+    defaults={'name': 'Can view GroupModulePermission'}
+)[0]
+group_module_permission_add = Permission.objects.get_or_create(
+    codename='add_groupmodulepermission',
+    content_type=group_module_permission_ct,
+    defaults={'name': 'Can add GroupModulePermission'}
+)[0]
+group_module_permission_change = Permission.objects.get_or_create(
+    codename='change_groupmodulepermission',
+    content_type=group_module_permission_ct,
+    defaults={'name': 'Can change GroupModulePermission'}
+)[0]
+group_module_permission_delete = Permission.objects.get_or_create(
+    codename='delete_groupmodulepermission',
+    content_type=group_module_permission_ct,
+    defaults={'name': 'Can delete GroupModulePermission'}
+)[0]
+
+
+
+
+########## CREACIÓN DE PERMISOS: GESTIÓN SEGURIDAD
+
+# Permisos de Cargo - CORREGIDO
+cargo_view = Permission.objects.get_or_create(  
+    codename='view_cargo',
+    content_type=cargo_ct,
+    defaults={'name': 'Can view cargo'}
+)[0]
+cargo_add = Permission.objects.get_or_create(  # Cambié usuario_add por user_add
+    codename='add_cargo',
+    content_type=cargo_ct,
+    defaults={'name': 'Can add cargo'}
+)[0]
+cargo_change = Permission.objects.get_or_create(  # Cambié usuario_change por user_change
+    codename='change_cargo',
+    content_type=cargo_ct,
+    defaults={'name': 'Can change cargo'}
+)[0]
+cargo_delete = Permission.objects.get_or_create(  # Cambié usuario_delete por user_delete
+    codename='delete_cargo',
+    content_type=cargo_ct,
+    defaults={'name': 'Can delete cargo'}
+)[0]
+
+
+
+
+# Permisos de Especialidad- CORREGIDO
+especialidadmedica_view= Permission.objects.get_or_create(  
+    codename='view_especialidadmedica',
+    content_type=especialidad_ct,
+    defaults={'name': 'Can view especialidad medica'}
+)[0]
+
+especialidadmedica_add= Permission.objects.get_or_create(  
+    codename='add_especialidadmedica',
+    content_type=especialidad_ct,
+    defaults={'name': 'Can add especialidad medica'}
+)[0]
+
+especialidadmedica_change= Permission.objects.get_or_create(  
+    codename='change_especialidadmedica',
+    content_type=especialidad_ct,
+    defaults={'name': 'Can change especialidad medica'}
+)[0]
+
+especialidadmedica_delete= Permission.objects.get_or_create(  
+    codename='delete_especialidadmedica',
+    content_type=especialidad_ct,
+    defaults={'name': 'Can delete especialidad medica'}
+)[0]
+
+
+
+# Permisos de Doctores - CORREGIDO
+doctor_view= Permission.objects.get_or_create(  
+    codename='view_doctor',
+    content_type=doctor_ct,
+    defaults={'name': 'Can view doctor'}
+)[0]
+
+
+doctor_add= Permission.objects.get_or_create(  
+    codename='add_doctor',
+    content_type=doctor_ct,
+    defaults={'name': 'Can add doctor'}
+)[0]
+
+doctor_change= Permission.objects.get_or_create(  
+    codename='change_doctor',
+    content_type=doctor_ct,
+    defaults={'name': 'Can change doctor'}
+)[0]
+
+
+doctor_delete= Permission.objects.get_or_create(  
+    codename='delete_doctor',
+    content_type=doctor_ct,
+    defaults={'name': 'Can delete doctor'}
+)[0]
+
+
+
+# Permisos de Empleados - CORREGIDO
+empleado_view= Permission.objects.get_or_create(  
+    codename='view_empleado',
+    content_type=empleado_ct,
+    defaults={'name': 'Can view empleado'}
+)[0]
+
+empleado_add= Permission.objects.get_or_create(  
+    codename='add_empleado',
+    content_type=empleado_ct,
+    defaults={'name': 'Can add empleado'}
+)[0]
+
+empleado_change= Permission.objects.get_or_create(  
+    codename='change_empleado',
+    content_type=empleado_ct,
+    defaults={'name': 'Can change empleado'}
+)[0]
+
+
+empleado_delete= Permission.objects.get_or_create(  
+    codename='delete_empleado',
+    content_type=empleado_ct,
+    defaults={'name': 'Can delete empleado'}
+)[0]
+
+
+
+
+
 # ============================================================================
 # CREACIÓN DE GroupModulePermission - VERSIÓN OPTIMIZADA
 # ============================================================================
@@ -362,3 +589,42 @@ if created:
         group_module_permission_change, 
         group_module_permission_delete
     ])
+    
+    
+    
+    
+    
+    
+# Asignar los módulos de Gestión Médica solo a los Asistentes 
+
+gmp_asist_cargos, created=GroupModulePermission.objects.get_or_create(
+    group=group_asistentes,
+    module=module14  # Cargos
+)
+if created:
+    gmp_asist_cargos.permissions.set([cargo_view])
+
+gmp_asist_especialidad, _= GroupModulePermission.objects.get_or_create(
+    group=group_asistentes,
+    module=module15  # Especialidades
+)
+
+gmp_asist_especialidad.permissions.set([especialidadmedica_view, especialidadmedica_add, especialidadmedica_change, especialidadmedica_change])
+
+
+gmp_asist_doctores, _= GroupModulePermission.objects.get_or_create(
+    group=group_asistentes,
+    module=module16  # Doctores
+)
+
+gmp_asist_doctores.permissions.set([doctor_add, doctor_delete, doctor_view, doctor_change])
+
+gmp_asist_empleados,_=GroupModulePermission.objects.get_or_create(
+    group=group_asistentes,
+    module=module17  # Empleados
+)
+gmp_asist_empleados.permissions.set([empleado_add, empleado_change, empleado_view, empleado_delete])
+
+
+
+
