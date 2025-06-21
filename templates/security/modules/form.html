@@ -2,7 +2,7 @@
 <title>{% block title %}{{title}}{% endblock %}</title>
 {% load static %}
 {% block content %}
-<section class="dark:bg-principal">
+<section class="bg-white">
     <div class="text-center" data-aos="fade" data-aos-delay="200">
         <div class="sm:pt-28 lg:pt-4">
              <h1 class="rounded-2xl  bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
@@ -12,16 +12,16 @@
 
         {% if form.non_field_errors %}
         <div class="mx-4 lg:mx-20 mb-6" data-aos="fade-up">
-            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg max-w-4xl mx-auto">
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg max-w-4xl mx-auto">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
                         <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg"></i>
                     </div>
                     <div class="ml-3">
-                        <h3 class="text-red-800 dark:text-red-200 font-medium">
+                        <h3 class="text-red-800 font-medium">
                             Se encontraron errores en el formulario:
                         </h3>
-                        <div class="mt-2 text-red-700 dark:text-red-300">
+                        <div class="mt-2 text-red-700">
                             <ul class="list-disc list-inside space-y-1">
                                 {% for error in form.non_field_errors %}
                                 <li>{{ error }}</li>
@@ -36,27 +36,26 @@
 
         <form method="post" class="space-y-6 py-4">
             <div class="mx-4 lg:mx-20" data-aos="fade">
-                <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto"
-                    data-aos="fade-up" data-aos-delay="200">
+                <div class="bg-white rounded-3xl p-8 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="200">
                     {% csrf_token %}
                     <div class="text-center mb-8">
-                        <div class="bg-gray-100 dark:bg-principal rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
+                        <div class="bg-gray-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
                             <i id="iconPreview" class="bi bi-x-octagon text-3xl text-gray-400"></i>
                         </div>
-                        <h2 class="dark:text-blue-300 text-2xl font-Pacifico">Vista previa del ícono</h2>
+                        <h2 class="text-blue-700 text-2xl font-Pacifico">Vista previa del ícono</h2>
                     </div>
 
                     {% for field in form.visible_fields %}
                     {% if field.name != 'permissions' %}
                     <div class="field-container mb-6 {% if field.errors %}has-error{% endif %}">
                         <label for="{{ field.id_for_label }}"
-                            class="font-black uppercase text-lg block mb-2 {% if field.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                            class="font-black uppercase text-lg block mb-2 {% if field.errors %}text-red-600{% else %}text-blue-700{% endif %}">
                             {{ field.label }}
                             {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                         </label>
                         {{ field }}
                         {% if field.errors %}
-                        <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                        <div class="mt-2 text-red-600 text-sm">
                             {% for error in field.errors %}
                             <div class="flex items-center mt-1">
                                 <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
@@ -69,50 +68,29 @@
                     {% endif %}
                     {% endfor %}
 
-                    <!-- Campo Permissions agrupado por app y modelo -->
-                    <div class="field-container mb-6 {% if form.permissions.errors %}has-error{% endif %}">
-                        <label class="font-black uppercase text-lg block mb-2 {% if form.permissions.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
-                            {{ form.permissions.label }}
-                            {% if form.permissions.field.required %}<span class="text-red-500">*</span>{% endif %}
-                        </label>
-                        <div class="max-h-60 overflow-y-auto border-2 {% if form.permissions.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} rounded-lg p-4 bg-white dark:bg-principal">
-                            {% regroup form.permissions.field.queryset by content_type.app_label as app_permission_list %}
-                            {% for app_group in app_permission_list %}
-                                <div class="mb-4">
-                                    <h4 class="text-base font-bold text-blue-700 dark:text-blue-300 mb-2">
-                                        {{ app_group.grouper|capfirst }}
-                                    </h4>
-                                    {% regroup app_group.list by content_type.model as model_permission_list %}
-                                    {% for model_group in model_permission_list %}
-                                        <div class="mb-2">
-                                            <h5 class="text-sm font-semibold text-indigo-700 dark:text-indigo-300 ml-2">{{ model_group.grouper|capfirst }}</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 ml-4">
-                                                {% for permission in model_group.list %}
-                                                    <label class="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
-                                                        <input type="checkbox"
-                                                               name="{{ form.permissions.name }}"
-                                                               value="{{ permission.pk }}"
-                                                               {% if permission.pk in form.permissions.value %}checked{% endif %}
-                                                               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ permission.name }}</span>
-                                                    </label>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold text-lg mb-2">Filtrar permisos</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <select id="appFilter" class="border p-2 rounded">
+                                <option value="">Seleccione una app</option>
+                            </select>
+                            <select id="modelFilter" class="border p-2 rounded" disabled>
+                                <option value="">Seleccione un modelo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="permissionsContainer" class="field-container mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {% for permission in form.permissions.field.queryset %}
+                            <label class="flex items-center permission-option app-{{ permission.content_type.app_label }} model-{{ permission.content_type.model }}">
+                                <input type="checkbox" name="{{ form.permissions.name }}" value="{{ permission.pk }}"
+                                    {% if permission.pk in form.permissions.value %}checked{% endif %}
+                                    class="mr-2">
+                                {{ permission.name }}
+                            </label>
                             {% endfor %}
                         </div>
-                        {% if form.permissions.errors %}
-                        <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
-                            {% for error in form.permissions.errors %}
-                            <div class="flex items-center mt-1">
-                                <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
-                                {{ error }}
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
 
                     <div class="flex flex-col md:flex-row justify-center items-center mt-8 space-y-3 md:space-y-0 md:space-x-8">
@@ -133,12 +111,70 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const appFilter = document.getElementById('appFilter');
+    const modelFilter = document.getElementById('modelFilter');
+    const permissionOptions = document.querySelectorAll('.permission-option');
+
+    let appsAndModels = {};
+    permissionOptions.forEach(el => {
+        const appMatch = el.className.match(/app-([\w-]+)/);
+        const modelMatch = el.className.match(/model-([\w-]+)/);
+        if (!appMatch || !modelMatch) return;
+        let app = appMatch[1];
+        let model = modelMatch[1];
+
+        if (!appsAndModels[app]) appsAndModels[app] = new Set();
+        appsAndModels[app].add(model);
+    });
+
+    Object.keys(appsAndModels).sort().forEach(app => {
+        const option = document.createElement('option');
+        option.value = app;
+        option.textContent = app.charAt(0).toUpperCase() + app.slice(1);
+        appFilter.appendChild(option);
+    });
+
+    appFilter.addEventListener('change', function () {
+        const selectedApp = this.value;
+        modelFilter.innerHTML = '<option value="">Seleccione un modelo</option>';
+        modelFilter.disabled = !selectedApp;
+
+        if (appsAndModels[selectedApp]) {
+            Array.from(appsAndModels[selectedApp]).sort().forEach(model => {
+                const opt = document.createElement('option');
+                opt.value = model;
+                opt.textContent = model.charAt(0).toUpperCase() + model.slice(1);
+                modelFilter.appendChild(opt);
+            });
+        }
+
+        updatePermissionVisibility();
+    });
+
+    modelFilter.addEventListener('change', updatePermissionVisibility);
+
+    function updatePermissionVisibility() {
+        const app = appFilter.value;
+        const model = modelFilter.value;
+
+        permissionOptions.forEach(el => {
+            const isChecked = el.querySelector('input').checked;
+            if (app && model && el.classList.contains(`app-${app}`) && el.classList.contains(`model-${model}`)) {
+                el.style.display = 'flex';
+            } else {
+                el.style.display = isChecked ? 'flex' : 'none';
+            }
+        });
+    }
+
+    updatePermissionVisibility();
+
     const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
     const iconPreview = document.getElementById('iconPreview');
 
     function updateIconPreview() {
         const iconClass = iconInput.value.trim();
-        iconPreview.className = iconClass ? iconClass + ' text-3xl text-blue-600 dark:text-blue-400' : 'bi bi-x-octagon text-3xl text-gray-400';
+        iconPreview.className = iconClass ? iconClass + ' text-3xl text-blue-600' : 'bi bi-x-octagon text-3xl text-gray-400';
     }
 
     updateIconPreview();
@@ -146,18 +182,18 @@ document.addEventListener('DOMContentLoaded', function() {
     iconInput.addEventListener('keyup', updateIconPreview);
     iconInput.addEventListener('change', updateIconPreview);
 
-    // Validación del formulario
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
         const selectedPermissions = document.querySelectorAll('input[name="{{ form.permissions.name }}"]:checked');
         if (selectedPermissions.length === 0) {
             e.preventDefault();
             alert('Debe seleccionar al menos un permiso para el módulo.');
-            return false;
         }
     });
 });
 </script>
 {% endblock %}
+
+
 
 
