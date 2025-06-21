@@ -1,0 +1,42 @@
+{% extends 'home.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% load static %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8 dark:bg-[#0b1121]" data-aos="fade-up" data-aos-delay="100">
+        <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% csrf_token %}
+
+            <!-- Título e ícono -->
+            <div class="md:col-span-2 text-center mb-6">
+                <div class="flex justify-center items-center">
+                    <img src="{% static 'img/icons/marca.png' %}" alt="icon" class="h-16">
+                </div>
+                <h1 class="text-2xl font-bold text-white uppercase mt-2">{{ title1 }}</h1>
+            </div>
+
+            <!-- Campo Nombre -->
+            <div class="md:col-span-2">
+                {{ form.nombre.label_tag }}
+                {{ form.nombre }}
+                {% for error in form.nombre.errors %}
+                    <div class="text-red-500 text-sm">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Botones -->
+            <div class="md:col-span-2 flex justify-center gap-4 mt-4">
+                <a href="{% url 'core:marca_list' %}" class="bg-red-700 hover:bg-red-800 text-white py-2 px-4 rounded">
+                    <i class="fa-solid fa-xmark mr-2"></i> Cancelar
+                </a>
+                <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded">
+                    <i class="fa-solid fa-save mr-2"></i> Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

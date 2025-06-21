@@ -1,0 +1,100 @@
+{% extends 'home.html' %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+
+{% block content %}
+{% load static %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+    <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="sm:pt-8 lg:pt-4">
+            <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
+                {{ title1 }}
+            </h1>
+        </div>
+
+        <!-- Buscador -->
+        <div class="p-4 flex justify-center">
+            <form method="GET">
+                <input type="text" name="q" placeholder="Buscar paciente"
+                    value="{{ request.GET.q }}"
+                    class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
+                           focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal
+                           dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500
+                           dark:focus:border-blue-500 dark:shadow-sm-light">
+            </form>
+        </div>
+
+        <!-- Tabla -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-center text-lg">
+                <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+                    <tr>
+                        <th class="px-6 py-3">ID</th>
+                        <th class="px-6 py-3">Paciente</th>
+                        <th class="px-6 py-3">Descripción</th>
+                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Imagen</th>
+                        <th class="px-6 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in fotospaciente %}
+                    <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                        <td class="px-6 py-4">{{ item.id }}</td>
+                        <td class="px-6 py-4">{{ item.paciente }}</td>
+                        <td class="px-6 py-4">{{ item.descripcion|truncatechars:50 }}</td>
+                        <td class="px-6 py-4">{{ item.fecha|date:"Y-m-d H:i" }}</td>
+                        <td class="px-6 py-4">
+                            {% if item.imagen %}
+                                <img src="{{ item.imagen.url }}" class="mx-auto h-16 rounded" alt="Foto">
+                            {% else %}
+                                Sin imagen
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if permissions.change_fotopaciente %}
+                            <a href="{% url 'core:fotopaciente_update' item.id %}" class="text-blue-600 dark:text-blue-500 hover:text-blue-800 mx-1">
+                                <i class="fa-solid fa-edit text-lg"></i>
+                            </a>
+                            {% endif %}
+                            {% if permissions.delete_fotopaciente %}
+                            <a href="#" class="text-red-600 dark:text-red-500 hover:text-red-800 mx-1"
+                               onclick="openDeleteModal('{{ item.id }}', '{{ item.paciente }}')">
+                                <i class="fa-solid fa-trash text-lg"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4">No hay fotos registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón nuevo -->
+        <div class="flex justify-center mt-4">
+            {% if permissions.add_fotopaciente %}
+            <a href="{% url 'core:fotopaciente_create' %}" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full">
+                <i class="fa-solid fa-plus mr-2"></i> Nueva Foto
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% include 'fragments/delete.html' %}
+
+<script>
+function openDeleteModal(id, paciente) {
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = `{% url 'core:fotopaciente_delete' 0 %}`.replace('0', id);
+    document.getElementById('Description').textContent = `ID: ${id} - ${paciente}`;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

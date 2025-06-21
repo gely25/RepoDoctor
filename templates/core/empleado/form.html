@@ -1,0 +1,62 @@
+{% extends 'home.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% load static %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+    <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0b1121] rounded-xl shadow">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-white mb-4">{{ title1 }}</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Nombres -->
+                <div>
+                    <label for="{{ form.nombres.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ form.nombres.label }}
+                    </label>
+                    {{ form.nombres }}
+                    {% if form.nombres.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.nombres.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Apellidos -->
+                <div>
+                    <label for="{{ form.apellidos.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ form.apellidos.label }}
+                    </label>
+                    {{ form.apellidos }}
+                    {% if form.apellidos.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.apellidos.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Cargo -->
+                <div>
+                    <label for="{{ form.cargo.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ form.cargo.label }}
+                    </label>
+                    {{ form.cargo }}
+                    {% if form.cargo.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.cargo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-center mt-6 space-x-4">
+                <button type="submit"
+                        class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-full transition">
+                    <i class="fa-solid fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'core:empleado_list' %}"
+                   class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-full transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

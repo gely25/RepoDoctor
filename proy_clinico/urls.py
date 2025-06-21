@@ -27,6 +27,7 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
     path('', ModuloTemplateView.as_view(), name='home'),
+    path('core/', include('applications.core.urls', namespace='core')),
     path('security/', include('applications.security.urls', namespace='security')),
     path("__reload__/", include("django_browser_reload.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

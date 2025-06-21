@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'applications.security.apps.SecurityConfig',
     'applications.doctor.apps.DoctorConfig',
+    'applications.core.apps.CoreConfig'
 ]
 INSTALLED_APPS = INSTALLED_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
