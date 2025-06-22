@@ -80,10 +80,17 @@
                         </div>
                     </div>
 
+                    <!-- Permisos seleccionados arriba -->
+                    <div id="selectedPermissions" class="mb-6">
+                        <h3 class="text-blue-700 font-semibold mb-2">Permisos seleccionados:</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2" id="selectedPermissionsList"></div>
+                    </div>
+
+                    <!-- Campo Permissions filtrado -->
                     <div id="permissionsContainer" class="field-container mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {% for permission in form.permissions.field.queryset %}
-                            <label class="flex items-center permission-option app-{{ permission.content_type.app_label }} model-{{ permission.content_type.model }}">
+                            <label class="flex items-center permission-option hidden app-{{ permission.content_type.app_label }} model-{{ permission.content_type.model }}" data-perm-id="{{ permission.pk }}">
                                 <input type="checkbox" name="{{ form.permissions.name }}" value="{{ permission.pk }}"
                                     {% if permission.pk in form.permissions.value %}checked{% endif %}
                                     class="mr-2">
@@ -114,14 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const appFilter = document.getElementById('appFilter');
     const modelFilter = document.getElementById('modelFilter');
     const permissionOptions = document.querySelectorAll('.permission-option');
+    const selectedPermissionsList = document.getElementById('selectedPermissionsList');
 
     let appsAndModels = {};
     permissionOptions.forEach(el => {
-        const appMatch = el.className.match(/app-([\w-]+)/);
-        const modelMatch = el.className.match(/model-([\w-]+)/);
-        if (!appMatch || !modelMatch) return;
-        let app = appMatch[1];
-        let model = modelMatch[1];
+        const classes = el.className.split(' ');
+        let app = classes.find(cls => cls.startsWith('app-')).replace('app-', '');
+        let model = classes.find(cls => cls.startsWith('model-')).replace('model-', '');
 
         if (!appsAndModels[app]) appsAndModels[app] = new Set();
         appsAndModels[app].add(model);
@@ -158,16 +164,62 @@ document.addEventListener('DOMContentLoaded', function() {
         const model = modelFilter.value;
 
         permissionOptions.forEach(el => {
-            const isChecked = el.querySelector('input').checked;
+            el.style.display = 'none';
             if (app && model && el.classList.contains(`app-${app}`) && el.classList.contains(`model-${model}`)) {
                 el.style.display = 'flex';
-            } else {
-                el.style.display = isChecked ? 'flex' : 'none';
             }
         });
+
+        // Agregar botón "Seleccionar todos"
+        if (model) {
+            const container = document.getElementById('permissionsContainer');
+            if (!document.getElementById('selectAllButton')) {
+                const button = document.createElement('button');
+                button.id = 'selectAllButton';
+                button.type = 'button';
+                button.className = 'mt-4 bg-blue-100 text-blue-700 py-1 px-4 rounded';
+                button.textContent = 'Seleccionar todos los permisos del modelo';
+                button.onclick = () => {
+                    permissionOptions.forEach(el => {
+                        if (el.style.display !== 'none') {
+                            const checkbox = el.querySelector('input[type="checkbox"]');
+                            checkbox.checked = true;
+                            moveToSelected(el);
+                        }
+                    });
+                };
+                container.insertBefore(button, container.firstChild);
+            }
+        }
     }
 
-    updatePermissionVisibility();
+    permissionOptions.forEach(el => {
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                moveToSelected(el);
+            } else {
+                removeFromSelected(el);
+            }
+        });
+
+        if (checkbox.checked) moveToSelected(el);
+    });
+
+    function moveToSelected(el) {
+        const clone = el.cloneNode(true);
+        clone.classList.remove('hidden');
+        clone.querySelector('input').checked = true;
+
+        const existing = selectedPermissionsList.querySelector(`[data-perm-id="${clone.dataset.permId}"]`);
+        if (!existing) selectedPermissionsList.appendChild(clone);
+    }
+
+    function removeFromSelected(el) {
+        const id = el.dataset.permId;
+        const selected = selectedPermissionsList.querySelector(`[data-perm-id="${id}"]`);
+        if (selected) selected.remove();
+    }
 
     const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
     const iconPreview = document.getElementById('iconPreview');
@@ -193,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
 
 
 
