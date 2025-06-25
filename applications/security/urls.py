@@ -9,10 +9,13 @@ from applications.security.views.groupModulePermission import (
     GroupModulePermissionCreateView,
     GroupModulePermissionUpdateView,
     GroupModulePermissionDeleteView,
+    SaveMultipleGroupPermissionsView,
+    GetAllModulePermissionsView,
     GetModulesByGroupView,
-    GetPermissionsByModuleView,
-    SaveGroupPermissionsView
+    GetPermissionsByModuleView
 )
+
+
 
 app_name = 'security'
 
@@ -41,10 +44,13 @@ urlpatterns = [
     path('group_module_permission_update/<int:pk>/', GroupModulePermissionUpdateView.as_view(), name='group_module_permission_update'),
     path('group_module_permission_delete/<int:pk>/', GroupModulePermissionDeleteView.as_view(), name='group_module_permission_delete'),
 
-    # Rutas AJAX para carga dinámica de módulos y permisos
-    path('get_modules_by_group/<int:group_id>/', GetModulesByGroupView.as_view(), name='get_modules_by_group'),
-    path('get_permissions_by_module/<int:module_id>/', GetPermissionsByModuleView.as_view(), name='get_permissions_by_module'),
-    path('save_group_permissions/', SaveGroupPermissionsView.as_view(), name='save_group_permissions'),
+    # URLs AJAX para asignación múltiple
+    path('save-multiple-permissions/', SaveMultipleGroupPermissionsView.as_view(), name='save_multiple_permissions'),
+    path('get-all-module-permissions/', GetAllModulePermissionsView.as_view(), name='get_all_module_permissions'),
+    
+    path('get-modules-by-group/<int:group_id>/', GetModulesByGroupView.as_view(), name='get_modules_by_group'),
+    path('get-permissions-by-module/<int:module_id>/', GetPermissionsByModuleView.as_view(), name='get_permissions_by_module'),
+
 
     # Autenticación
     path('signin/', signin, name='signin'),

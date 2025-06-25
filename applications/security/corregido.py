@@ -233,7 +233,6 @@ user2.groups.add(group_asistentes)
 # Create permissions for Patient and Diagnosis models
 patient_ct = ContentType.objects.get(app_label='doctor', model='patient')
 diagnosis_ct = ContentType.objects.get(app_label='doctor', model='diagnosis')
-
 # Patient permissions
 patient_view = Permission.objects.get_or_create(codename='view_patient', name='Can view Paciente', content_type=patient_ct)[0]
 patient_add = Permission.objects.get_or_create(codename='add_patient', name='Can add Paciente', content_type=patient_ct)[0]
@@ -589,6 +588,7 @@ if created:
         group_module_permission_change, 
         group_module_permission_delete
     ])
+    
     
     
     

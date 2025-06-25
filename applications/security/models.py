@@ -178,3 +178,5 @@ class User(AbstractUser, PermissionsMixin):
             return self.image.url
         else:
             return '/static/img/usuario_anonimo.png'
+
+
