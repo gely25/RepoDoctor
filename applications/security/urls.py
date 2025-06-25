@@ -1,5 +1,6 @@
 from django.urls import path
 
+# Importaciones de vistas...
 from applications.security.views.auth import signin, signout
 from applications.security.views.menu import MenuCreateView, MenuDeleteView, MenuListView, MenuUpdateView
 from applications.security.views.module import ModuleCreateView, ModuleDeleteView, ModuleListView, ModuleUpdateView
@@ -14,8 +15,9 @@ from applications.security.views.groupModulePermission import (
     GetModulesByGroupView,
     GetPermissionsByModuleView
 )
-
-
+from applications.security.views.group import (
+    GroupListView, GroupCreateView, GroupUpdateView, GroupDeleteView
+)
 
 app_name = 'security'
 
@@ -47,14 +49,16 @@ urlpatterns = [
     # URLs AJAX para asignación múltiple
     path('save-multiple-permissions/', SaveMultipleGroupPermissionsView.as_view(), name='save_multiple_permissions'),
     path('get-all-module-permissions/', GetAllModulePermissionsView.as_view(), name='get_all_module_permissions'),
-    
     path('get-modules-by-group/<int:group_id>/', GetModulesByGroupView.as_view(), name='get_modules_by_group'),
     path('get-permissions-by-module/<int:module_id>/', GetPermissionsByModuleView.as_view(), name='get_permissions_by_module'),
 
+    # Grupos
+    path('grupos/', GroupListView.as_view(), name='group_list'),
+    path('grupos/crear/', GroupCreateView.as_view(), name='group_create'),
+    path('grupos/editar/<int:pk>/', GroupUpdateView.as_view(), name='group_update'),
+    path('grupos/eliminar/<int:pk>/', GroupDeleteView.as_view(), name='group_delete'),
 
     # Autenticación
     path('signin/', signin, name='signin'),
     path('logout/', signout, name='signout'),
 ]
-
-
