@@ -1,0 +1,127 @@
+{% extends 'home.html' %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+{% block content %}
+{% load static %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+    <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="sm:pt-8 lg:pt-4">
+            <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
+                {{ title1 }}
+            </h1>
+        </div>
+
+        <div class="lg:p-2 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+            <!-- Barra de búsqueda -->
+            <div class="p-4 flex justify-center">
+                <form method="GET">
+                    <input type="text" name="q" id="table-search"
+                        class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:text-gray-400"
+                        placeholder="Buscar pagos..." value="{{ request.GET.q }}">
+                </form>
+            </div>
+
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-center text-lg">
+                    <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+                        <tr>
+                            <th class="px-6 py-3">ID</th>
+                            <th class="px-6 py-3">Atención</th>
+                            <th class="px-6 py-3">Método</th>
+                            <th class="px-6 py-3">Monto</th>
+                            <th class="px-6 py-3">Estado</th>
+                            <th class="px-6 py-3">Fecha</th>
+                            <th class="px-6 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in pagos %}
+                        <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                            <td class="px-6 py-4">{{ item.id }}</td>
+                            <td class="px-6 py-4">{{ item.atencion|default:"—" }}</td>
+                            <td class="px-6 py-4">{{ item.get_metodo_pago_display }}</td>
+                            <td class="px-6 py-4">${{ item.monto_total }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-sm rounded-full 
+                                    {% if item.estado == 'pendiente' %}bg-yellow-100 dark:bg-yellow-800{% elif item.estado == 'pagado' %}bg-green-100 dark:bg-green-800{% else %}bg-red-100 dark:bg-red-800{% endif %}">
+                                    {{ item.get_estado_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">{{ item.fecha_pago|date:"Y-m-d H:i" }}</td>
+                            <td class="px-6 py-4">
+                                {% if permissions.change_pago %}
+                                <a href="{% url 'doctor:pago_update' item.id %}" class="text-blue-600 hover:text-blue-800 mx-1">
+                                    <i class="fa-solid fa-edit text-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if permissions.delete_pago %}
+                                <a href="#" class="text-red-600 hover:text-red-800 mx-1"
+                                    onclick="openDeleteModal('{{ item.id }}', 'Pago de ${{ item.monto_total }}')">
+                                    <i class="fa-solid fa-trash text-lg"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="py-4 text-gray-500 dark:text-gray-300">No se encontraron pagos.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="flex justify-center mt-4">
+                <nav>
+                    <ul class="inline-flex -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="navegacion">Primera</a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li>
+                            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="{% if num == page_obj.number %}pagina-activa{% else %}pagina{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="navegacion">Siguiente</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col md:flex-row justify-center form-group text-center p-4">
+                {% if permissions.add_pago %}
+                <a href="{% url 'doctor:pago_create' %}" class="boton-accion">
+                    <i class="fa-solid fa-plus mr-2"></i>Nuevo Pago
+                </a>
+                {% endif %}
+                <a href="{% url 'home' %}" class="boton-accion bg-gray-600 hover:bg-gray-700">
+                    <i class="fa-solid fa-house"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'fragments/delete.html' %}
+<script>
+    function openDeleteModal(id, descripcion) {
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.action = `{% url 'doctor:pago_delete' 0 %}`.replace('0', id);
+        document.getElementById('Description').textContent = descripcion;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>
+{% endblock %}

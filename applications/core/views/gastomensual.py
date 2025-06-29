@@ -12,12 +12,17 @@ class GastoMensualListView(PermissionMixin, ListViewMixin, ListView):
     template_name = 'core/gastomensual/list.html'
     context_object_name = 'gastos'
     permission_required = 'view_gastomensual'
-
+    
     def get_queryset(self):
         q1 = self.request.GET.get('q')
         if q1:
-            self.query.add(Q(descripcion__icontains=q1), Q.OR)
+            self.query.add(
+                Q(tipo_gasto__nombre__icontains=q1) |
+                Q(observacion__icontains=q1),
+                Q.OR
+            )
         return self.model.objects.filter(self.query).order_by('-fecha')
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,6 +63,6 @@ class GastoMensualDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['grabar'] = 'Eliminar Gasto'
-        context['description'] = f"¿Desea eliminar el gasto: {self.object.descripcion}?"
+        context['description'] = f"¿Desea eliminar el gasto del {self.object.fecha} por {self.object.valor} USD?"
         context['back_url'] = self.success_url
         return context

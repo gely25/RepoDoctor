@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Semanal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .appointment-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .appointment-card:hover {
+            transform: translateY(-1px);
+        }
+        .modal {
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .time-slot:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gray-50 min-h-screen">
+        <!-- Header -->
+        <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Agenda Semanal</h1>
+                    <p class="text-sm text-gray-600 mt-1" id="week-range">
+                        Semana del 24 - 28 Jun 2025
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="changeWeek(-1)" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button onclick="changeWeek(0)" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                        Hoy
+                    </button>
+                    <button onclick="changeWeek(1)" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="px-6 py-3 bg-white border-b border-gray-200">
+            <div class="flex items-center space-x-6 text-sm">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-gray-700">Disponible</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span class="text-gray-700">Ocupado</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <span class="text-gray-700">Atendido</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="p-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <!-- Days Header -->
+                <div class="grid grid-cols-6 bg-gray-50 border-b border-gray-200" id="days-header">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <!-- Time Slots -->
+                <div class="divide-y divide-gray-200" id="calendar-grid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Cita -->
+    <div id="viewModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Detalles de la Cita</h3>
+                <button onclick="closeModal('viewModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="appointmentDetails">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="editAppointment()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Editar
+                </button>
+                <button onclick="deleteAppointment()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Eliminar
+                </button>
+                <button onclick="closeModal('viewModal')" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Cita -->
+    <div id="addModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Nueva Cita</h3>
+                <button onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="appointmentForm">
+                <!-- ✅ CAMPO OCULTO AGREGADO AQUÍ -->
+                <input type="hidden" id="editando_id" name="editando_id">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+                        <select id="paciente" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Seleccionar paciente...</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                            <input type="date" id="fecha" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora</label>
+                            <input type="time" id="hora" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                        <select id="estado" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="disponible">Disponible</option>
+                            <option value="ocupado">Ocupado</option>
+                            <option value="atendido">Atendido</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                        <textarea id="observaciones" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentWeekOffset = 0;
+        let currentEditingId = null;
+        let appointments = {};
+        let patients = {};
+        const HORAS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+
+        // URLs corregidas - ESTAS DEBEN COINCIDIR CON TUS URLS DE DJANGO
+        const URLS = {
+            citas: '/doctor/api/citas/',
+            pacientes: '/doctor/api/pacientes/',
+            crear_cita: '/doctor/api/citas/crear/',
+            actualizar_cita: '/doctor/api/citas/actualizar/',
+            eliminar_cita: '/doctor/api/citas/eliminar/'
+        };
+
+        // Función para obtener el token CSRF
+        function getCsrfToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    return value;
+                }
+            }
+            return '';
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPatients();
+            loadWeekData();
+        });
+
+        // Cargar pacientes para el select
+        async function loadPatients() {
+            try {
+                const response = await fetch(URLS.pacientes);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                patients = await response.json();
+                
+                const select = document.getElementById('paciente');
+                select.innerHTML = '<option value="">Seleccionar paciente...</option>';
+                
+                Object.values(patients).forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = patient.nombre_completo;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error cargando pacientes:', error);
+                alert('Error al cargar los pacientes');
+            }
+        }
+
+        // Cargar datos de la semana
+        async function loadWeekData() {
+            try {
+                const response = await fetch(`${URLS.citas}?week_offset=${currentWeekOffset}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                appointments = data.appointments || {};
+                renderCalendar(data.week_dates);
+            } catch (error) {
+                console.error('Error cargando datos de la semana:', error);
+                alert('Error al cargar los datos de la semana');
+            }
+        }
+
+        // Renderizar el calendario
+        function renderCalendar(weekDates) {
+            renderDaysHeader(weekDates);
+            renderTimeSlots(weekDates);
+            updateWeekRange(weekDates);
+        }
+
+        // Renderizar encabezado de días
+
+
+        function renderDaysHeader(weekDates) {
+            const header = document.getElementById('days-header');
+            const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
+
+            header.innerHTML = '<div class="p-4 border-r border-gray-200"></div>';
+
+            weekDates.forEach((date, index) => {
+                const [year, month, day] = date.split('-').map(Number);
+                const dateObj = new Date(year, month - 1, day); // ✅ sin UTC
+
+                const isToday = isDateTodayLocal(year, month, day);
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `p-4 text-center font-semibold text-gray-700 ${index < 4 ? 'border-r border-gray-200' : ''}`;
+
+                dayDiv.innerHTML = `
+                    <div class="text-sm text-gray-500">${dayNames[index]}</div>
+                    <div class="text-lg ${isToday ? 'bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">${day}</div>
+                    <div class="text-xs text-gray-400">${dateObj.toLocaleDateString('es-ES', { month: 'short' })}</div>
+                `;
+
+                header.appendChild(dayDiv);
+            });
+        }
+
+
+        // Renderizar slots de tiempo
+  
+        function renderTimeSlots(weekDates) {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            HORAS.forEach(hora => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-6 min-h-[80px]';
+
+                // Etiqueta de la hora
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'p-4 text-sm font-medium text-gray-600 bg-gray-50 border-r border-gray-200 flex items-center';
+                timeLabel.textContent = hora;
+                row.appendChild(timeLabel);
+
+                // Celdas de cada día
+                weekDates.forEach((date, index) => {
+                    const [year, month, day] = date.split('-').map(Number);
+                    const dateObj = new Date(year, month - 1, day); // ✅ sin UTC
+
+                    const slot = document.createElement('div');
+                    slot.className = `p-2 ${index < 4 ? 'border-r border-gray-200' : ''} time-slot`;
+
+                    const appointment = findAppointment(date, hora);
+
+                    if (appointment) {
+                        slot.innerHTML = createAppointmentCard(appointment);
+                        slot.onclick = () => viewAppointment(appointment.id);
+                    } else {
+                        slot.innerHTML = createEmptySlot();
+                        slot.onclick = () => addAppointment(date, hora); // 👉 Usa `date` directamente
+                    }
+
+                    row.appendChild(slot);
+                });
+
+                grid.appendChild(row);
+        });
+}
+
+
+        // Encontrar cita por fecha y hora
+        function findAppointment(date, hora) {
+            return Object.values(appointments).find(apt => 
+                apt.fecha === date && apt.hora.substring(0, 5) === hora
+            );
+        }
+
+        // Crear tarjeta de cita
+        function createAppointmentCard(appointment) {
+            const statusColors = {
+                'disponible': 'bg-green-100 border-green-300 text-green-800',
+                'ocupado': 'bg-blue-100 border-blue-300 text-blue-800',
+                'atendido': 'bg-purple-100 border-purple-300 text-purple-800'
+            };
+            
+            return `
+                <div class="appointment-card ${statusColors[appointment.estado]} border rounded-lg p-2 cursor-pointer h-full">
+                    <div class="font-medium text-sm truncate">${appointment.paciente}</div>
+                    <div class="text-xs opacity-75">${appointment.hora}</div>
+                </div>
+            `;
+        }
+
+        // Crear slot vacío
+        function createEmptySlot() {
+            return `
+                <div class="h-full flex items-center justify-center text-gray-300 hover:text-gray-500 transition-colors cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+            `;
+        }
+
+        // Verificar si es hoy
+    
+        function isDateTodayLocal(year, month, day) {
+            const today = new Date();
+            return (
+                today.getFullYear() === year &&
+                today.getMonth() + 1 === month &&
+                today.getDate() === day
+            );
+        }
+
+
+        // Actualizar rango de semana
+        function updateWeekRange(weekDates) {
+            const startDate = new Date(weekDates[0]);
+            const endDate = new Date(weekDates[4]);
+            
+            const formatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+            const start = startDate.toLocaleDateString('es-ES', formatOptions);
+            const end = endDate.toLocaleDateString('es-ES', formatOptions);
+            
+            document.getElementById('week-range').textContent = `Semana del ${start} - ${end}`;
+        }
+
+        // Cambiar semana
+        function changeWeek(direction) {
+            if (direction === 0) {
+                currentWeekOffset = 0; // Semana actual
+            } else {
+                currentWeekOffset += direction;
+            }
+            loadWeekData();
+        }
+
+        // Ver detalles de cita
+        function viewAppointment(id) {
+            const appointment = appointments[id];
+            if (!appointment) return;
+
+            const detailsHtml = `
+                <div class="space-y-3">
+                    <div>
+                        <span class="font-medium text-gray-700">Paciente:</span>
+                        <span class="text-gray-900">${appointment.paciente}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-700">Fecha:</span>
+                        <span class="text-gray-900">${formatDate(appointment.fecha)}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-700">Hora:</span>
+                        <span class="text-gray-900">${appointment.hora}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-700">Estado:</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(appointment.estado)}">${getStatusText(appointment.estado)}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-700">Observaciones:</span>
+                        <p class="text-gray-900 mt-1">${appointment.observaciones || 'Sin observaciones'}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('appointmentDetails').innerHTML = detailsHtml;
+            currentEditingId = id;
+            openModal('viewModal');
+        }
+
+        // Agregar nueva cita
+
+        function addAppointment(fecha, hora) {
+            currentEditingId = null;
+            document.getElementById('modalTitle').textContent = 'Nueva Cita';
+            document.getElementById('appointmentForm').reset();
+
+            // ✅ Asignar la fecha directamente como string plano
+            document.getElementById('fecha').value = fecha;
+
+            document.getElementById('hora').value = hora;
+            document.getElementById('editando_id').value = '';
+            openModal('addModal');
+        }
+
+
+
+   
+
+        // ✅ FUNCIÓN EDITAPPOINTMENT CORREGIDA
+        function editAppointment() {
+            if (!currentEditingId || !appointments[currentEditingId]) {
+                alert("No se puede editar: cita no encontrada.");
+                return;
+            }
+
+            const appointment = appointments[currentEditingId];
+            const form = document.getElementById('appointmentForm');
+
+            // Guardar valores originales para comparación
+            form.dataset.fechaOriginal = appointment.fecha;
+            form.dataset.horaOriginal = appointment.hora;
+            form.dataset.pacienteOriginal = appointment.paciente_id;
+            form.dataset.estadoOriginal = appointment.estado;
+            form.dataset.observacionesOriginal = appointment.observaciones || '';
+
+            // Cargar datos en el formulario
+            document.getElementById('modalTitle').textContent = 'Editar Cita';
+            document.getElementById('paciente').value = appointment.paciente_id;
+            document.getElementById('fecha').value = appointment.fecha;
+            document.getElementById('hora').value = appointment.hora;
+            document.getElementById('estado').value = appointment.estado;
+            document.getElementById('observaciones').value = appointment.observaciones || '';
+
+            // ✅ NUEVO: Guardamos el ID actual en el campo oculto
+            document.getElementById('editando_id').value = currentEditingId;
+
+            closeModal('viewModal');
+            openModal('addModal');
+        }
+
+        // Eliminar cita
+        async function deleteAppointment() {
+            if (!currentEditingId) return;
+            
+            if (!confirm('¿Está seguro de que desea eliminar esta cita?')) return;
+            
+            try {
+                const response = await fetch(`${URLS.eliminar_cita}${currentEditingId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    closeModal('viewModal');
+                    loadWeekData();
+                    alert(result.message || 'Cita eliminada correctamente');
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.error || 'Error al eliminar la cita'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar la cita');
+            }
+        }
+
+        // Funciones de modal
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // ✅ Limpiar campo oculto cuando se cierra modal
+            if (modalId === 'addModal') {
+                document.getElementById('editando_id').value = '';
+            }
+            currentEditingId = null;
+        }
+
+        // Obtener clase CSS según el estado
+        function getStatusClass(estado) {
+            const classes = {
+                'disponible': 'bg-green-100 text-green-800',
+                'ocupado': 'bg-blue-100 text-blue-800',
+                'atendido': 'bg-purple-100 text-purple-800'
+            };
+            return classes[estado] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Obtener texto del estado
+        function getStatusText(estado) {
+            const texts = {
+                'disponible': 'Disponible',
+                'ocupado': 'Ocupado',
+                'atendido': 'Atendido'
+            };
+            return texts[estado] || estado;
+        }
+
+        // Formatear fecha
+     
+        function formatDate(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            const localDate = new Date(year, month - 1, day); // sin UTC
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return localDate.toLocaleDateString('es-ES', options);
+        }
+
+
+        // ✅ SUBMIT COMPLETAMENTE CORREGIDO
+        document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const form = document.getElementById('appointmentForm');
+
+            const nuevaFecha = document.getElementById('fecha').value;
+            const nuevaHora = document.getElementById('hora').value;
+            const nuevoPaciente = document.getElementById('paciente').value;
+            const nuevoEstado = document.getElementById('estado').value;
+            const nuevasObservaciones = document.getElementById('observaciones').value;
+
+            let formData = {};
+
+            // ✅ NUEVO: usar campo oculto como fuente de verdad para saber si estamos editando
+            const editandoId = document.getElementById('editando_id').value;
+
+            if (editandoId) {
+                // MODO EDICIÓN
+                const fechaOriginal = form.dataset.fechaOriginal;
+                const horaOriginal = form.dataset.horaOriginal?.slice(0, 5);
+                const nuevaHoraFormateada = nuevaHora.slice(0, 5);
+
+                const pacienteOriginal = form.dataset.pacienteOriginal;
+                const estadoOriginal = form.dataset.estadoOriginal;
+                const observacionesOriginal = form.dataset.observacionesOriginal || '';
+
+                const fechaOriginalISO = new Date(fechaOriginal).toISOString().slice(0, 10);
+                const nuevaFechaISO = new Date(nuevaFecha).toISOString().slice(0, 10);
+
+                if (fechaOriginalISO !== nuevaFechaISO) {
+                    formData.fecha = nuevaFecha;
+                }
+
+                if (nuevaHoraFormateada !== horaOriginal) {
+                    formData.hora_cita = nuevaHora;
+                }
+
+                if (nuevoPaciente !== pacienteOriginal) {
+                    formData.paciente = parseInt(nuevoPaciente);
+                }
+
+                if (nuevoEstado !== estadoOriginal) {
+                    formData.estado = nuevoEstado;
+                }
+
+                if (nuevasObservaciones !== observacionesOriginal) {
+                    formData.observaciones = nuevasObservaciones;
+                }
+
+                if (Object.keys(formData).length === 0) {
+                    alert("No se realizaron cambios en la cita.");
+                    return;
+                }
+            } else {
+                // MODO CREACIÓN
+                formData = {
+                    fecha: nuevaFecha,
+                    hora_cita: nuevaHora,
+                    paciente: parseInt(nuevoPaciente),
+                    estado: nuevoEstado,
+                    observaciones: nuevasObservaciones
+                };
+            }
+
+
+            if (editandoId) {
+                // MODO EDICIÓN - SIEMPRE INCLUIMOS PACIENTE
+                formData = {
+                    paciente: parseInt(nuevoPaciente), // ✅ SIEMPRE enviamos paciente
+                };
+
+                const fechaOriginal = form.dataset.fechaOriginal;
+                const horaOriginal = form.dataset.horaOriginal?.slice(0, 5);
+                const nuevaHoraFormateada = nuevaHora.slice(0, 5);
+
+                const pacienteOriginal = form.dataset.pacienteOriginal;
+                const estadoOriginal = form.dataset.estadoOriginal;
+                const observacionesOriginal = form.dataset.observacionesOriginal || '';
+
+                const fechaOriginalISO = new Date(fechaOriginal).toISOString().slice(0, 10);
+                const nuevaFechaISO = new Date(nuevaFecha).toISOString().slice(0, 10);
+
+                if (fechaOriginalISO !== nuevaFechaISO) {
+                    formData.fecha = nuevaFecha;
+                }
+
+                if (nuevaHoraFormateada !== horaOriginal) {
+                    formData.hora_cita = nuevaHora;
+                }
+
+                if (nuevoEstado !== estadoOriginal) {
+                    formData.estado = nuevoEstado;
+                }
+
+                if (nuevasObservaciones !== observacionesOriginal) {
+                    formData.observaciones = nuevasObservaciones;
+                }
+
+                if (Object.keys(formData).length <= 1) {  // solo tenía 'paciente'
+                    alert("No se realizaron cambios en la cita.");
+                    return;
+                }
+            } else {
+                // MODO CREACIÓN
+                formData = {
+                    fecha: nuevaFecha,
+                    hora_cita: nuevaHora,
+                    paciente: parseInt(nuevoPaciente),
+                    estado: nuevoEstado,
+                    observaciones: nuevasObservaciones
+                };
+            }
+
+
+            try {
+                let url, method;
+                if (editandoId) {
+                    url = `${URLS.actualizar_cita}${editandoId}/`;
+                    method = 'PUT';
+                } else {
+                    url = URLS.crear_cita;
+                    method = 'POST';
+                }
+
+
+                console.log('Enviando datos a:', url);
+                console.log('Método:', method);
+                console.log('Payload:', formData);
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+
+                if (response.ok) {
+                    const result = await response.json();
+                    closeModal('addModal');
+                    document.getElementById('editando_id').value = ''; // ✅ Limpiar ID al terminar
+                    loadWeekData();
+                    alert(result.message || (editandoId ? 'Cita actualizada correctamente' : 'Cita creada correctamente'));
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar la cita');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+{% comment %} 
+
+        // Agregar nueva cita
+        function addAppointment(fecha, hora) {
+            currentEditingId = null;
+            document.getElementById('modalTitle').textContent = 'Nueva Cita';
+            document.getElementById('appointmentForm').reset();
+    
+            // ✅ POR ESTA LÍNEA (corrige el desfase de zona horaria):
+            document.getElementById('fecha').value = new Date(fecha + 'T12:00:00').toISOString().split('T')[0];
+            
+            document.getElementById('hora').value = hora;
+            document.getElementById('editando_id').value = '';
+            openModal('addModal');
+            document.getElementById('hora').value = hora;
+            // ✅ Limpiar campo oculto para nueva cita
+            document.getElementById('editando_id').value = '';
+            openModal('addModal');
+        }
+ {% endcomment %}

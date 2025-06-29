@@ -45,84 +45,90 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for item in modules %}
-                            {% for group_permission in item.group_permissions.all %}
-                            <tr class="text-gray-700 bg-white border-b border-gray-200 hover:bg-gray-50"> 
-                                <td class="px-6 py-4">{{ group_permission.id }}</td>
-                                <td class="px-6 py-4 font-semibold">
-                                    <div class="flex items-center justify-center">
-                                        <i class="fa-solid fa-users text-lg text-green-600 dark:text-green-400 mr-2"></i>
-                                        {{ group_permission.group.name }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 font-semibold">
-                                    <div class="flex items-center justify-center">
-                                        <i class="fa-solid fa-puzzle-piece text-lg text-blue-600 dark:text-blue-400 mr-2"></i>
-                                        {{ item.name }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center">
-                                        <i class="{{ item.menu.icon }} text-lg text-purple-600 dark:text-purple-400 mr-2"></i>
-                                        {{ item.menu.name }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-wrap gap-1 justify-center">
-                                        {% for permission in group_permission.permissions.all %}
-                                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
-                                            {{ permission.name|capfirst }}
-                                        </span>
-                                        {% empty %}
-                                        <span class="bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-xs">
-                                            Sin permisos
-                                        </span>
-                                        {% endfor %}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    {% if permissions.change_groupmodulepermission %}
-                                    <a href="{% url 'security:group_module_permission_update' group_permission.id %}"
-                                        class="text-blue-600 dark:text-blue-500 hover:text-blue-800 mx-1">
-                                        <i class="fa-solid fa-edit text-lg"></i>
-                                    </a>
-                                    {% endif %}  
-                                    {% if permissions.delete_groupmodulepermission %}
-                                    <a href="#"
-                                        class="text-red-600 dark:text-red-500 hover:text-red-800 mx-1"
-                                        onclick="openDeleteModal('{{ group_permission.id }}', '{{ group_permission.group.name }} - {{ item.name }}')">
-                                        <i class="fa-solid fa-trash text-lg"></i>
-                                    </a>
-                                    {% endif %} 
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr class="text-gray-700 bg-white border-b border-gray-200">
-                                <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                    <div class="flex flex-col items-center">
-                                        <i class="fa-solid fa-inbox text-4xl mb-3 text-gray-300"></i>
-                                        <p class="text-lg">No se encontraron permisos de grupo módulo</p>
-                                        <p class="text-sm">Intenta con otros términos de búsqueda</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% empty %}
-                            <tr class="text-gray-700 bg-white border-b border-gray-200">
-                                <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                    <div class="flex flex-col items-center">
-                                        <i class="fa-solid fa-inbox text-4xl mb-3 text-gray-300"></i>
-                                        <p class="text-lg">No hay módulos registrados</p>
-                                        <p class="text-sm">Primero debe crear módulos para asignar permisos</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                            {% comment %}
+                            Contamos el total de group_permissions para verificar si hay datos
+                            {% endcomment %}
+                            {% with total_permissions=0 %}
+                                {% for item in modules %}
+                                    {% for group_permission in item.group_permissions.all %}
+                                        {% with total_permissions=total_permissions|add:1 %}
+                                        <tr class="text-gray-700 bg-white border-b border-gray-200 hover:bg-gray-50"> 
+                                            <td class="px-6 py-4">{{ group_permission.id }}</td>
+                                            <td class="px-6 py-4 font-semibold">
+                                                <div class="flex items-center justify-center">
+                                                    <i class="fa-solid fa-users text-lg text-green-600 dark:text-green-400 mr-2"></i>
+                                                    {{ group_permission.group.name }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 font-semibold">
+                                                <div class="flex items-center justify-center">
+                                                    <i class="fa-solid fa-puzzle-piece text-lg text-blue-600 dark:text-blue-400 mr-2"></i>
+                                                    {{ item.name }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center justify-center">
+                                                    <i class="{{ item.menu.icon }} text-lg text-purple-600 dark:text-purple-400 mr-2"></i>
+                                                    {{ item.menu.name }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex flex-wrap gap-1 justify-center">
+                                                    {% for permission in group_permission.permissions.all %}
+                                                    <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
+                                                        {{ permission.name|capfirst }}
+                                                    </span>
+                                                    {% empty %}
+                                                    <span class="bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-xs">
+                                                        Sin permisos
+                                                    </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {% if permissions.change_groupmodulepermission %}
+                                                <a href="{% url 'security:group_module_permission_update' group_permission.id %}"
+                                                    class="text-blue-600 dark:text-blue-500 hover:text-blue-800 mx-1">
+                                                    <i class="fa-solid fa-edit text-lg"></i>
+                                                </a>
+                                                {% endif %}  
+                                                {% if permissions.delete_groupmodulepermission %}
+                                                <a href="#"
+                                                    class="text-red-600 dark:text-red-500 hover:text-red-800 mx-1"
+                                                    onclick="openDeleteModal('{{ group_permission.id }}', '{{ group_permission.group.name }} - {{ item.name }}')">
+                                                    <i class="fa-solid fa-trash text-lg"></i>
+                                                </a>
+                                                {% endif %} 
+                                            </td>
+                                        </tr>
+                                        {% endwith %}
+                                    {% endfor %}
+                                {% empty %}
+                                    {% comment %}
+                                    Este empty se ejecuta solo si no hay módulos en absoluto
+                                    {% endcomment %}
+                                    <tr class="text-gray-700 bg-white border-b border-gray-200">
+                                        <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fa-solid fa-inbox text-4xl mb-3 text-gray-300"></i>
+                                                {% if request.GET.q %}
+                                                    <p class="text-lg">No se encontraron permisos de grupo módulo</p>
+                                                    <p class="text-sm">No hay resultados para "{{ request.GET.q }}"</p>
+                                                {% else %}
+                                                    <p class="text-lg">No hay módulos registrados</p>
+                                                    <p class="text-sm">Primero debe crear módulos para asignar permisos</p>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Paginación -->
+                {% if page_obj.paginator.count > 0 %}
                 <div class="flex justify-center mt-4">
                     <nav aria-label="Page navigation example">
                         <ul class="inline-flex -space-x-px">
@@ -149,6 +155,7 @@
                         </ul>
                     </nav>
                 </div>
+                {% endif %}
 
                 <!-- Enlaces adicionales -->
                 <div class="flex flex-col md:flex-row justify-center form-group text-center p-4">
@@ -167,19 +174,18 @@
         </div>
     </section>
 
-    {% include 'fragments/delete.html' %}
+{% include 'fragments/delete.html' %}
+    
     <script>
 function openDeleteModal(id, name) {
     const deleteForm = document.getElementById('deleteForm');
-    deleteForm.action = {% url 'security:group_module_permission_delete' 0 %}.replace('0', id);
-    document.getElementById('Description').textContent = ID: ${id} - ${name};
+    deleteForm.action = "{% url 'security:group_module_permission_delete' 0 %}".replace('0', id);
+    document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
-
 function closeModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
-
 // Asegurar redirección correcta
 document.addEventListener('DOMContentLoaded', function() {
     const deleteForm = document.getElementById('deleteForm');

@@ -19,10 +19,12 @@ class UsuarioListView(PermissionMixin, ListViewMixin, ListView):
 
     def get_queryset(self):
         q1 = self.request.GET.get('q')
-        if q1 is not None:
+        self.query = Q()  # ← Esto es fundamental
+        if q1:
             self.query.add(Q(username__icontains=q1), Q.OR)
 
         return self.model.objects.filter(self.query).order_by('id')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['create_url'] = reverse_lazy('security:usuario_create')
@@ -42,6 +44,7 @@ class UsuarioCreateView(PermissionMixin, CreateViewMixin, CreateView):
         context = super().get_context_data()
         context['grabar'] = 'Grabar Usuario'
         context['back_url'] = self.success_url
+        context['is_create']= True
         return context
 
     def form_valid(self, form):
@@ -60,6 +63,7 @@ class UsuarioUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['grabar'] = 'Actualizar Usuario'
+        context['is_create']= False
         return context
 
     def form_valid(self, form):

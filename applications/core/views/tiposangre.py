@@ -19,12 +19,18 @@ class TipoSangreListView(PermissionMixin, ListViewMixin, ListView):
         q1 = self.request.GET.get('q')
         if q1:
             self.query.add(Q(tipo__icontains=q1), Q.OR)
+            self.query.add(Q(descripcion__icontains=q1), Q.OR)
         return self.model.objects.filter(self.query).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['create_url'] = reverse_lazy('core:tiposangre_create')
         return context
+    
+    
+    
+    
+    
 
 class TipoSangreCreateView(PermissionMixin, CreateViewMixin, CreateView):
     model = TipoSangre

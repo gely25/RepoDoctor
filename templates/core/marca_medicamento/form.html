@@ -27,6 +27,24 @@
                 {% endfor %}
             </div>
 
+            <!-- Campo Descripción -->
+            <div class="md:col-span-2">
+                {{ form.descripcion.label_tag }}
+                {{ form.descripcion }}
+                {% for error in form.descripcion.errors %}
+                    <div class="text-red-500 text-sm">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Campo Activo -->
+            <div class="md:col-span-2 flex items-center space-x-2">
+                {{ form.activo }}
+                {{ form.activo.label_tag }}
+                {% for error in form.activo.errors %}
+                    <div class="text-red-500 text-sm">{{ error }}</div>
+                {% endfor %}
+            </div>
+
             <!-- Botones -->
             <div class="md:col-span-2 flex justify-center gap-4 mt-4">
                 <a href="{% url 'core:marca_list' %}" class="bg-red-700 hover:bg-red-800 text-white py-2 px-4 rounded">

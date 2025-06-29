@@ -1,121 +1,105 @@
 from django.contrib import admin
+
+from django.contrib import admin
+from django.utils.html import format_html
 from applications.core.models import (
-    Paciente, TipoSangre, FotoPaciente, Doctor, Empleado, Cargo,
-    EspecialidadMedica, Diagnostico, Medicamento, TipoMedicamento,
-    MarcaMedicamento, TipoGasto, GastoMensual
+    TipoSangre, Paciente, Especialidad, Doctor, Cargo, Empleado,
+    TipoMedicamento, MarcaMedicamento, Medicamento,
+    Diagnostico, TipoGasto, GastoMensual, FotoPaciente
 )
 
-from applications.core.forms.paciente import PacienteForm
-from applications.core.forms.tiposangre import TipoSangreForm
-from applications.core.forms.fotopaciente import FotoPacienteForm
-from applications.core.forms.doctor import DoctorForm
-from applications.core.forms.empleado import EmpleadoForm
-from applications.core.forms.cargo import CargoForm
-from applications.core.forms.especialidad import EspecialidadMedicaForm
-from applications.core.forms.diagnostico import DiagnosticoForm
-from applications.core.forms.medicamento import MedicamentoForm
-from applications.core.forms.tipomed import TipoMedicamentoForm
-from applications.core.forms.marca import MarcaMedicamentoForm
-from applications.core.forms.tipogasto import TipoGastoForm
-from applications.core.forms.gastomensual import GastoMensualForm
-
+@admin.register(TipoSangre)
+class TipoSangreAdmin(admin.ModelAdmin):
+    list_display = ('tipo', 'descripcion')
+    search_fields = ('tipo',)
 
 
 @admin.register(Paciente)
 class PacienteAdmin(admin.ModelAdmin):
-    form = PacienteForm
-    list_display = ('nombres', 'apellidos', 'fecha_nacimiento', 'tipo_sangre')
-    search_fields = ('nombres', 'apellidos')
-    list_filter = ('tipo_sangre',)
+    list_display = ('nombre_completo', 'cedula_ecuatoriana', 'email', 'sexo', 'estado_civil', 'tipo_sangre', 'activo')
+    list_filter = ('sexo', 'estado_civil', 'activo', 'tipo_sangre')
+    search_fields = ('nombres', 'apellidos', 'cedula_ecuatoriana', 'email')
+    readonly_fields = ('edad', 'get_image')
+
+    def get_image(self, obj):
+        if obj.foto:
+            return format_html('<img src="{}" width="50" height="50" />', obj.foto.url)
+        return "-"
+    get_image.short_description = 'Foto'
 
 
-@admin.register(TipoSangre)
-class TipoSangreAdmin(admin.ModelAdmin):
-    form = TipoSangreForm
-    list_display = ('tipo',)
-    search_fields = ('tipo',)
-
-
-@admin.register(FotoPaciente)
-class FotoPacienteAdmin(admin.ModelAdmin):
-    form = FotoPacienteForm
-    list_display = ('paciente', 'descripcion', 'fecha')
-    search_fields = ('paciente__nombres', 'descripcion')
-    list_filter = ('fecha',)
+@admin.register(Especialidad)
+class EspecialidadAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'activo')
+    search_fields = ('nombre',)
+    list_filter = ('activo',)
 
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
-    form = DoctorForm
-    list_display = ('nombres', 'apellidos', 'especialidad', 'cargo')
-    search_fields = ('nombres', 'apellidos')
-    list_filter = ('especialidad', 'cargo')
-
-
-@admin.register(Empleado)
-class EmpleadoAdmin(admin.ModelAdmin):
-    form = EmpleadoForm
-    list_display = ('nombres', 'apellidos', 'cargo')
-    search_fields = ('nombres', 'apellidos')
-    list_filter = ('cargo',)
+    list_display = ('nombre_completo', 'codigo_unico_doctor', 'ruc', 'email', 'activo')
+    list_filter = ('especialidad', 'activo')
+    search_fields = ('nombres', 'apellidos', 'codigo_unico_doctor', 'ruc')
 
 
 @admin.register(Cargo)
 class CargoAdmin(admin.ModelAdmin):
-    form = CargoForm
-    list_display = ('nombre',)
+    list_display = ('nombre', 'activo')
     search_fields = ('nombre',)
+    list_filter = ('activo',)
 
 
-@admin.register(EspecialidadMedica)
-class EspecialidadMedicaAdmin(admin.ModelAdmin):
-    form = EspecialidadMedicaForm
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
-
-
-@admin.register(Diagnostico)
-class DiagnosticoAdmin(admin.ModelAdmin):
-    form = DiagnosticoForm
-    list_display = ('paciente', 'doctor', 'fecha')
-    search_fields = ('paciente__nombres', 'doctor__nombres')
-    list_filter = ('fecha',)
-
-
-@admin.register(Medicamento)
-class MedicamentoAdmin(admin.ModelAdmin):
-    form = MedicamentoForm
-    list_display = ('nombre', 'marca', 'tipo', 'stock')
-    search_fields = ('nombre', 'descripcion')
-    list_filter = ('marca', 'tipo')
-
-
-@admin.register(MarcaMedicamento)
-class MarcaMedicamentoAdmin(admin.ModelAdmin):
-    form = MarcaMedicamentoForm
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
+@admin.register(Empleado)
+class EmpleadoAdmin(admin.ModelAdmin):
+    list_display = ('nombre_completo', 'cedula_ecuatoriana', 'cargo', 'sueldo', 'activo')
+    search_fields = ('nombres', 'apellidos', 'cedula_ecuatoriana')
+    list_filter = ('cargo', 'activo')
 
 
 @admin.register(TipoMedicamento)
 class TipoMedicamentoAdmin(admin.ModelAdmin):
-    form = TipoMedicamentoForm
-    list_display = ('nombre',)
+    list_display = ('nombre', 'activo')
     search_fields = ('nombre',)
+    list_filter = ('activo',)
+
+
+@admin.register(MarcaMedicamento)
+class MarcaMedicamentoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'activo')
+    search_fields = ('nombre',)
+    list_filter = ('activo',)
+
+
+@admin.register(Medicamento)
+class MedicamentoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'tipo', 'marca_medicamento', 'precio', 'cantidad', 'comercial', 'activo')
+    search_fields = ('nombre',)
+    list_filter = ('tipo', 'marca_medicamento', 'comercial', 'activo')
+
+
+@admin.register(Diagnostico)
+class DiagnosticoAdmin(admin.ModelAdmin):
+    list_display = ('codigo', 'descripcion', 'activo')
+    search_fields = ('codigo', 'descripcion')
+    list_filter = ('activo',)
 
 
 @admin.register(TipoGasto)
 class TipoGastoAdmin(admin.ModelAdmin):
-    form = TipoGastoForm
-    list_display = ('nombre',)
+    list_display = ('nombre', 'activo')
     search_fields = ('nombre',)
+    list_filter = ('activo',)
 
 
 @admin.register(GastoMensual)
 class GastoMensualAdmin(admin.ModelAdmin):
-    form = GastoMensualForm
-    list_display = ('tipo', 'monto', 'fecha')
-    search_fields = ('descripcion',)
-    list_filter = ('tipo', 'fecha')
+    list_display = ('tipo_gasto', 'valor', 'fecha')
+    search_fields = ('tipo_gasto__nombre',)
+    list_filter = ('tipo_gasto', 'fecha')
 
 
+@admin.register(FotoPaciente)
+class FotoPacienteAdmin(admin.ModelAdmin):
+    list_display = ('paciente', 'fecha_subida', 'descripcion')
+    search_fields = ('paciente__nombres', 'paciente__apellidos')
+    list_filter = ('fecha_subida', 'paciente')

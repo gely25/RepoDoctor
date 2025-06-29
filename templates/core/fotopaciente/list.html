@@ -33,7 +33,7 @@
                         <th class="px-6 py-3">ID</th>
                         <th class="px-6 py-3">Paciente</th>
                         <th class="px-6 py-3">Descripción</th>
-                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Fecha de Subida</th>
                         <th class="px-6 py-3">Imagen</th>
                         <th class="px-6 py-3">Acciones</th>
                     </tr>
@@ -44,7 +44,7 @@
                         <td class="px-6 py-4">{{ item.id }}</td>
                         <td class="px-6 py-4">{{ item.paciente }}</td>
                         <td class="px-6 py-4">{{ item.descripcion|truncatechars:50 }}</td>
-                        <td class="px-6 py-4">{{ item.fecha|date:"Y-m-d H:i" }}</td>
+                        <td class="px-6 py-4">{{ item.fecha_subida|date:"Y-m-d H:i" }}</td>
                         <td class="px-6 py-4">
                             {% if item.imagen %}
                                 <img src="{{ item.imagen.url }}" class="mx-auto h-16 rounded" alt="Foto">
@@ -71,6 +71,28 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+
+
+                        <!-- Paginación -->
+            {% if is_paginated %}
+            <div class="flex justify-center items-center mt-6 space-x-2">
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ request.GET.q }}&page=1" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-secundario dark:hover:bg-secundario/70">&laquo; Primero</a>
+                    <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-secundario dark:hover:bg-secundario/70">Anterior</a>
+                {% endif %}
+
+                <span class="px-4 py-1 rounded bg-blue-700 text-white dark:bg-blue-600">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-secundario dark:hover:bg-secundario/70">Siguiente</a>
+                    <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-secundario dark:hover:bg-secundario/70">Última &raquo;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
         </div>
 
         <!-- Botón nuevo -->

@@ -1,46 +1,66 @@
 from django import forms
-from django.forms import ModelForm
-from applications.core.models import Medicamento
+from applications.core.models import Medicamento, TipoMedicamento, MarcaMedicamento
+from django.core.exceptions import ValidationError
 
-class MedicamentoForm(ModelForm):
+class MedicamentoForm(forms.ModelForm):
     class Meta:
         model = Medicamento
-        fields = ["nombre", "marca", "tipo", "descripcion", "stock"]
-
+        fields = '__all__'
         widgets = {
-            "nombre": forms.TextInput(attrs={
-                "placeholder": "Ingrese nombre del medicamento",
-                "id": "id_nombre",
-                "class": "form-control",
+            'tipo': forms.Select(attrs={
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
             }),
-            "marca": forms.Select(attrs={
-                "id": "id_marca",
-                "class": "form-control",
+            'marca_medicamento': forms.Select(attrs={
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
             }),
-            "tipo": forms.Select(attrs={
-                "id": "id_tipo",
-                "class": "form-control",
+            'nombre': forms.TextInput(attrs={
+                'placeholder': 'Ejemplo: Ibuprofeno',
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
             }),
-            "descripcion": forms.Textarea(attrs={
-                "placeholder": "Descripción (opcional)",
-                "id": "id_descripcion",
-                "class": "form-control",
-                "rows": 3,
+            'descripcion': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Escriba indicaciones, usos, precauciones...',
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
             }),
-            "stock": forms.NumberInput(attrs={
-                "placeholder": "Ingrese cantidad disponible",
-                "id": "id_stock",
-                "class": "form-control",
+            'concentracion': forms.TextInput(attrs={
+                'placeholder': 'Ejemplo: 500mg, 5%',
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
             }),
-        }
-
-        labels = {
-            "nombre": "Nombre del Medicamento",
-            "marca": "Marca",
-            "tipo": "Tipo",
-            "descripcion": "Descripción",
-            "stock": "Stock Disponible",
+            'via_administracion': forms.Select(attrs={
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
+            }),
+            'cantidad': forms.NumberInput(attrs={
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
+            }),
+            'precio': forms.NumberInput(attrs={
+                'step': '0.01',
+                'class': 'w-full rounded-lg border border-gray-300 p-2.5 dark:bg-secundario dark:text-white'
+            }),
+            'comercial': forms.CheckboxInput(attrs={
+                'class': 'rounded text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400'
+            }),
+            'activo': forms.CheckboxInput(attrs={
+                'class': 'rounded text-green-600 focus:ring-green-500 dark:focus:ring-green-400'
+            }),
+            'foto': forms.ClearableFileInput(attrs={
+                'class': 'w-full border-gray-300 dark:bg-secundario dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+            }),
         }
 
     def clean_nombre(self):
-        return self.cleaned_data.get("nombre").upper()
+        nombre = self.cleaned_data['nombre']
+        if len(nombre) < 3:
+            raise ValidationError("El nombre del medicamento debe tener al menos 3 caracteres.")
+        return nombre
+
+    def clean_precio(self):
+        precio = self.cleaned_data['precio']
+        if precio <= 0:
+            raise ValidationError("El precio debe ser mayor que cero.")
+        return precio
+
+    def clean_cantidad(self):
+        cantidad = self.cleaned_data['cantidad']
+        if cantidad < 0:
+            raise ValidationError("La cantidad no puede ser negativa.")
+        return cantidad

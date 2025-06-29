@@ -16,7 +16,7 @@
         <!-- Buscador -->
         <div class="p-4 flex justify-center">
             <form method="GET">
-                <input type="text" name="q" id="table-search" placeholder="Buscar diagnóstico"
+                <input type="text" name="q" id="table-search" placeholder="Buscar por código o descripción"
                        value="{{ request.GET.q }}"
                        class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
                               focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal
@@ -30,20 +30,24 @@
             <table class="w-full text-center text-lg">
                 <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
                     <tr>
-                        <th class="px-6 py-3">ID</th>
-                        <th class="px-6 py-3">Paciente</th>
-                        <th class="px-6 py-3">Doctor</th>
-                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Código</th>
+                        <th class="px-6 py-3">Descripción</th>
+                        <th class="px-6 py-3">Activo</th>
                         <th class="px-6 py-3">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in diagnosticos %}
                     <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
-                        <td class="px-6 py-4">{{ item.id }}</td>
-                        <td class="px-6 py-4">{{ item.paciente }}</td>
-                        <td class="px-6 py-4">{{ item.doctor }}</td>
-                        <td class="px-6 py-4">{{ item.fecha }}</td>
+                        <td class="px-6 py-4 font-semibold">{{ item.codigo }}</td>
+                        <td class="px-6 py-4">{{ item.descripcion }}</td>
+                        <td class="px-6 py-4">
+                            {% if item.activo %}
+                                <span class="text-green-600 font-bold">Sí</span>
+                            {% else %}
+                                <span class="text-red-500 font-bold">No</span>
+                            {% endif %}
+                        </td>
                         <td class="px-6 py-4">
                             {% if permissions.change_diagnostico %}
                             <a href="{% url 'core:diagnostico_update' item.id %}" class="text-blue-600 dark:text-blue-500 hover:text-blue-800 mx-1">
@@ -52,14 +56,14 @@
                             {% endif %}
                             {% if permissions.delete_diagnostico %}
                             <a href="#" class="text-red-600 dark:text-red-500 hover:text-red-800 mx-1"
-                               onclick="openDeleteModal('{{ item.id }}', '{{ item.paciente }}')">
+                               onclick="openDeleteModal('{{ item.id }}', '{{ item.codigo }} - {{ item.descripcion }}')">
                                 <i class="fa-solid fa-trash text-lg"></i>
                             </a>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center py-4">No hay diagnósticos registrados.</td></tr>
+                    <tr><td colspan="4" class="text-center py-4">No hay diagnósticos registrados.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -78,11 +82,12 @@
 
 {% include 'fragments/delete.html' %}
 
+<!-- JS Modal eliminación -->
 <script>
 function openDeleteModal(id, nombre) {
     const deleteForm = document.getElementById('deleteForm');
     deleteForm.action = `{% url 'core:diagnostico_delete' 0 %}`.replace('0', id);
-    document.getElementById('Description').textContent = `ID: ${id} - ${nombre}`;
+    document.getElementById('Description').textContent = `Código: ${nombre}`;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
 

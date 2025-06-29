@@ -1,0 +1,54 @@
+{% extends 'home.html' %}
+{% load static %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+
+{% block content %}
+<section class="bg-white">
+  <div class="text-center pt-6">
+    <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">{{ title1 }}</h1>
+  </div>
+
+  <form method="post" class="mx-auto max-w-4xl py-8">
+    {% csrf_token %}
+
+    <div class="bg-white rounded-3xl p-6 shadow-md">
+
+      {% if form.non_field_errors %}
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+        <h3 class="text-red-800 font-semibold">Errores:</h3>
+        <ul class="list-disc list-inside text-red-700">
+          {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for field in form.visible_fields %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% for error in field.errors %}
+          <p class="text-red-600 text-sm">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="flex justify-center gap-6 mt-8">
+        <button type="submit"
+          class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-6 rounded shadow-md transition">
+          <i class="fa fa-save mr-2"></i> Guardar
+        </button>
+        <a href="{{ back_url }}"
+          class="bg-red-700 hover:bg-red-800 text-white py-2 px-6 rounded shadow-md transition">
+          <i class="fa fa-times mr-2"></i> Cancelar
+        </a>
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}

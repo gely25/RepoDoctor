@@ -4,7 +4,13 @@ from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from applications.core.models import FotoPaciente
 from applications.core.forms.fotopaciente import FotoPacienteForm
-from applications.security.components.mixin_crud import PermissionMixin, ListViewMixin, CreateViewMixin, UpdateViewMixin, DeleteViewMixin
+from applications.security.components.mixin_crud import (
+    PermissionMixin,
+    ListViewMixin,
+    CreateViewMixin,
+    UpdateViewMixin,
+    DeleteViewMixin
+)
 
 class FotoPacienteListView(PermissionMixin, ListViewMixin, ListView):
     model = FotoPaciente
@@ -15,8 +21,11 @@ class FotoPacienteListView(PermissionMixin, ListViewMixin, ListView):
     def get_queryset(self):
         q1 = self.request.GET.get('q')
         if q1:
-            self.query.add(Q(paciente__nombres__icontains=q1) | Q(paciente__apellidos__icontains=q1), Q.OR)
-        return self.model.objects.filter(self.query).order_by('-fecha')
+            self.query.add(
+                Q(paciente__nombres__icontains=q1) | Q(paciente__apellidos__icontains=q1),
+                Q.OR
+            )
+        return self.model.objects.filter(self.query).order_by('-fecha_subida')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,6 +63,6 @@ class FotoPacienteDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['grabar'] = 'Eliminar Foto'
-        context['description'] = f"¿Desea eliminar la foto del paciente: {self.object.paciente} del {self.object.fecha.strftime('%Y-%m-%d')}?"
+        context['description'] = f"¿Desea eliminar la foto del paciente: {self.object.paciente} del {self.object.fecha_subida.strftime('%Y-%m-%d')}?"
         context['back_url'] = self.success_url
         return context

@@ -5,13 +5,12 @@ from applications.core.models import TipoGasto
 class TipoGastoForm(ModelForm):
     class Meta:
         model = TipoGasto
-        fields = ["nombre"]
+        fields = ["nombre", "descripcion", "activo"]
 
-        error_messages = {
-            "nombre": {
-                "unique": "Ya existe un tipo de gasto con este nombre.",
-                "required": "El nombre es obligatorio.",
-            },
+        labels = {
+            "nombre": "Nombre del Tipo de Gasto",
+            "descripcion": "Descripción del Gasto",
+            "activo": "¿Activo?",
         }
 
         widgets = {
@@ -23,10 +22,26 @@ class TipoGastoForm(ModelForm):
                          "dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 "
                          "dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
             }),
+            "descripcion": forms.Textarea(attrs={
+                "placeholder": "Ingrese una descripción (opcional)",
+                "id": "id_descripcion",
+                "rows": 3,
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg "
+                         "focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                         "dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 "
+                         "dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "activo": forms.CheckboxInput(attrs={
+                "class": "h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded "
+                         "dark:bg-gray-700 dark:border-gray-600",
+            }),
         }
 
-        labels = {
-            "nombre": "Nombre del Tipo de Gasto",
+        error_messages = {
+            "nombre": {
+                "unique": "Ya existe un tipo de gasto con este nombre.",
+                "required": "El nombre es obligatorio.",
+            },
         }
 
     def clean_nombre(self):

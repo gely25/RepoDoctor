@@ -245,175 +245,150 @@
 </style>
 
 <script>
-  let groupConfigurations = {};
-  let currentGroupId = null;
-  let allModulesData = {};
-  let isUpdateMode = {{ is_update|yesno:"true,false" }};
-  let existingConfigurations = {{ existing_configurations|default:"{}"|safe }};
-  let existingData = {{ existing_data|default:"{}"|safe }};
+// Variables globales corregidas
+let groupConfigurations = {};
+let currentGroupId = null;
+let allModulesData = {};
+let isUpdateMode = {{ is_update|yesno:"true,false" }};
+let existingConfigurations = {{ existing_configurations|default:"{}"|safe }};
+let existingData = {{ existing_data|default:"{}"|safe }};
 
-  document.addEventListener('DOMContentLoaded', () => {
-    if (isUpdateMode && existingData?.group_id) {
-      groupConfigurations = JSON.parse(JSON.stringify(existingConfigurations));
-      setTimeout(() => {
-        selectGroup(existingData.group_id, existingData.group_name, true);
-      }, 100);
-    }
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  if (isUpdateMode && existingData?.group_id) {
+    groupConfigurations = JSON.parse(JSON.stringify(existingConfigurations));
+    setTimeout(() => {
+      selectGroup(existingData.group_id, existingData.group_name, true);
+    }, 100);
+  }
+});
 
+// Función corregida para verificar si un módulo ya está asignado
 function isModuleAlreadyAssigned(moduleId, groupId) {
-  // Siempre verificar contra las configuraciones guardadas en base de datos
+  // Solo verificar contra las configuraciones existentes en BD del MISMO grupo
   if (existingConfigurations && existingConfigurations[groupId]) {
-    if (existingConfigurations[groupId].modules.includes(moduleId)) {
-      return true;  // Ya fue asignado en BD, incluso si no estamos en modo edición
-    }
+    return existingConfigurations[groupId].modules.includes(moduleId);
   }
-
-  // Verificar contra configuraciones actuales en memoria
-  for (const [configGroupId, config] of Object.entries(groupConfigurations)) {
-    if (parseInt(configGroupId) !== parseInt(groupId) && config.modules.includes(moduleId)) {
-      return true;
-    }
-  }
-
   return false;
 }
 
+// Función corregida para crear tarjetas de módulos
+function createModuleCard(module, config) {
+  const alreadySelected = config.modules.includes(module.id);
+  const moduleCard = document.createElement('div');
+  moduleCard.classList.add('module-card');
+  
+  // Solo verificar asignación previa en BD para el grupo actual
+  const isAlreadyAssignedInDB = isModuleAlreadyAssigned(module.id, currentGroupId);
+  
+  let disabled = false;
+  let statusMessage = '';
+  let cardClasses = [];
+  let textColor = '';
+  
+  if (module.permissions_count === 0) {
+    disabled = true;
+    cardClasses.push('opacity-50', 'cursor-not-allowed');
+    statusMessage = '<div class="text-xs text-red-500 mt-1">Sin permisos disponibles</div>';
+    textColor = 'text-gray-500';
+  } else if (isAlreadyAssignedInDB && !alreadySelected) {
+    // Solo deshabilitar si ya existe en BD y no está en la configuración actual
+    disabled = true;
+    cardClasses.push('module-assigned');
+    statusMessage = '<div class="text-xs text-red-500 mt-1 font-medium">Ya asignado en base de datos</div>';
+    textColor = 'text-gray-500';
+  } else if (alreadySelected) {
+    cardClasses.push('module-selected');
+    statusMessage = '<div class="text-xs text-green-600 mt-1">Seleccionado en configuración actual</div>';
+  }
+  
+  cardClasses.forEach(cls => moduleCard.classList.add(cls));
 
-  // Nueva función para crear tarjetas de módulos con validación de asignación
-  function createModuleCard(module, config) {
-    const alreadySelected = config.modules.includes(module.id);
-    const moduleCard = document.createElement('div');
-    moduleCard.classList.add('module-card');
-    
-    // Verificar si el módulo ya está asignado a este grupo (desde configuraciones existentes)
-    const isAlreadyAssigned = isModuleAlreadyAssigned(module.id, currentGroupId);
-    
-    // Determinar el estado del módulo
-    let disabled = false;
-    let statusMessage = '';
-    let cardClasses = [];
-    let textColor = '';
-    
-    if (module.permissions_count === 0) {
-      disabled = true;
-      cardClasses.push('opacity-50', 'cursor-not-allowed');
-      statusMessage = '<div class="text-xs text-red-500 mt-1">Sin permisos disponibles</div>';
-      textColor = 'text-gray-500';
-    } else if (isAlreadyAssigned && !alreadySelected) {
-      disabled = true;
-      cardClasses.push('module-assigned');
-      statusMessage = '<div class="text-xs text-red-500 mt-1 font-medium">Este módulo ya ha sido asignado a este grupo</div>';
-      textColor = 'text-gray-500';
-    } else if (alreadySelected) {
-      cardClasses.push('module-selected');
-      statusMessage = '<div class="text-xs text-green-600 mt-1">Seleccionado en configuración actual</div>';
-    }
-    
-    // Aplicar las clases CSS
-    cardClasses.forEach(cls => moduleCard.classList.add(cls));
+  const checked = alreadySelected ? 'checked' : '';
+  const disabledAttr = disabled ? 'disabled' : '';
 
-    const checked = alreadySelected ? 'checked' : '';
-    const disabledAttr = disabled ? 'disabled' : '';
-
-    moduleCard.innerHTML = `
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <input type="checkbox" 
-                 class="checkbox-module" 
-                 id="module_${module.id}" 
-                 ${checked} 
-                 ${disabledAttr}
-                 onclick="selectModule(${module.id}, '${module.name}')">
-          <label for="module_${module.id}" 
-                 class="cursor-pointer ${textColor}">${module.name}</label>
-        </div>
-        <span class="text-xs text-gray-500">${module.permissions_count || 0} permisos</span>
+  moduleCard.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <input type="checkbox" 
+               class="checkbox-module" 
+               id="module_${module.id}" 
+               ${checked} 
+               ${disabledAttr}
+               onclick="selectModule(${module.id}, '${module.name}')">
+        <label for="module_${module.id}" 
+               class="cursor-pointer ${textColor}">${module.name}</label>
       </div>
-      ${statusMessage}
-    `;
-    
-    return moduleCard;
+      <span class="text-xs text-gray-500">${module.permissions_count || 0} permisos</span>
+    </div>
+    ${statusMessage}
+  `;
+  
+  return moduleCard;
+}
+
+// Función corregida para seleccionar grupo
+function selectGroup(groupId, groupName, isInitialLoad = false) {
+  if (isUpdateMode && !isInitialLoad) {
+    alert("No puedes cambiar el grupo en modo edición.");
+    return;
   }
 
-  function selectGroup(groupId, groupName, isInitialLoad = false) {
-    if (isUpdateMode && !isInitialLoad) {
-      alert("No puedes cambiar el grupo en modo edición.");
-      return;
-    }
+  // Actualizar UI de selección de grupo
+  document.querySelectorAll('.group-card').forEach(card => card.classList.remove('selected'));
+  const groupCard = document.querySelector(`[data-group-id="${groupId}"]`);
+  if (groupCard) groupCard.classList.add('selected');
 
-    document.querySelectorAll('.group-card').forEach(card => card.classList.remove('selected'));
+  currentGroupId = groupId;
 
-    const groupCard = document.querySelector(`[data-group-id="${groupId}"]`);
-    if (groupCard) groupCard.classList.add('selected');
+  // Limpiar contenedores
+  document.getElementById('moduleContainer').innerHTML = '';
+  document.getElementById('permissionsContainer').innerHTML = '';
 
-    currentGroupId = groupId;
-
-    // Limpiar módulos y permisos del grupo anterior
-    document.getElementById('moduleContainer').innerHTML = '';
-    document.getElementById('permissionsContainer').innerHTML = '';
-
-    if (!groupConfigurations[groupId]) {
-      groupConfigurations[groupId] = {
-        group_id: groupId,
-        group_name: groupName,
-        modules: [],
-        permissions: {}
-      };
-    }
-
-    fetch(`/security/get-modules-by-group/${groupId}/`)
-      .then(response => response.json())
-      .then(data => {
-        allModulesData[groupId] = data.modules;
-
-        const moduleContainer = document.getElementById('moduleContainer');
-        moduleContainer.innerHTML = '';
-        const cfg = groupConfigurations[groupId];
-
-        // Usar la nueva función createModuleCard para cada módulo
-        data.modules.forEach(module => {
-          const moduleCard = createModuleCard(module, cfg);
-          moduleContainer.appendChild(moduleCard);
-        });
-
-        document.getElementById('modulesSection').style.display = 'block';
-        document.getElementById('permissionsSection').style.display = 'block';
-
-        // Cargar permisos de módulos ya configurados
-        cfg.modules.forEach((moduleId, index) => {
-          const moduleData = data.modules.find(m => m.id === moduleId);
-          if (moduleData) {
-            setTimeout(() => {
-              loadModulePermissions(moduleId, moduleData.name, true);
-            }, index * 150);
-          }
-        });
-
-        updateSummary();
-      })
-      .catch(err => console.error('Error al cargar módulos:', err));
+  // Inicializar configuración del grupo si no existe
+  if (!groupConfigurations[groupId]) {
+    groupConfigurations[groupId] = {
+      group_id: groupId,
+      group_name: groupName,
+      modules: [],
+      permissions: {}
+    };
   }
 
-  // Función para actualizar el estado visual de las tarjetas de módulos
-  function updateModuleCardStatus(moduleId, status) {
-    const moduleCard = document.querySelector(`#module_${moduleId}`).closest('.module-card');
-    const statusDiv = moduleCard.querySelector('.text-xs');
-    
-    if (status === 'selected') {
-      moduleCard.classList.add('module-selected');
-      if (statusDiv && !statusDiv.classList.contains('text-red-500')) {
-        statusDiv.className = 'text-xs text-green-600 mt-1';
-        statusDiv.textContent = 'Seleccionado en configuración actual';
-      }
-    } else if (status === 'unselected') {
-      moduleCard.classList.remove('module-selected');
-      if (statusDiv && statusDiv.classList.contains('text-green-600')) {
-        statusDiv.remove();
-      }
-    }
-  }
+  // Cargar módulos para el grupo
+  fetch(`/security/get-modules-by-group/${groupId}/`)
+    .then(response => response.json())
+    .then(data => {
+      allModulesData[groupId] = data.modules;
 
+      const moduleContainer = document.getElementById('moduleContainer');
+      moduleContainer.innerHTML = '';
+      const cfg = groupConfigurations[groupId];
+
+      // Crear tarjetas de módulos con la configuración correcta del grupo
+      data.modules.forEach(module => {
+        const moduleCard = createModuleCard(module, cfg);
+        moduleContainer.appendChild(moduleCard);
+      });
+
+      document.getElementById('modulesSection').style.display = 'block';
+      document.getElementById('permissionsSection').style.display = 'block';
+
+      // Cargar permisos de módulos ya configurados para este grupo
+      cfg.modules.forEach((moduleId, index) => {
+        const moduleData = data.modules.find(m => m.id === moduleId);
+        if (moduleData) {
+          setTimeout(() => {
+            loadModulePermissions(moduleId, moduleData.name, true);
+          }, index * 150);
+        }
+      });
+
+      updateSummary();
+    })
+    .catch(err => console.error('Error al cargar módulos:', err));
+}
+
+// Función corregida para seleccionar módulo
 function selectModule(moduleId, moduleName) {
   const config = groupConfigurations[currentGroupId];
   const checkbox = document.getElementById(`module_${moduleId}`);
@@ -421,63 +396,88 @@ function selectModule(moduleId, moduleName) {
   if (!checkbox || checkbox.disabled) return;
 
   if (checkbox.checked) {
+    // Verificar si ya está asignado en BD (solo para el grupo actual)
     if (isModuleAlreadyAssigned(moduleId, currentGroupId)) {
       checkbox.checked = false;
-      alert(`❌ Este módulo ya ha sido asignado previamente a este grupo. No puedes volver a asignarlo.`);
+      alert(`❌ Este módulo ya está asignado a este grupo en la base de datos.`);
       return;
     }
 
+    // Verificar si ya está en la configuración actual
     if (config.modules.includes(moduleId)) {
       checkbox.checked = false;
       return;
     }
 
+    // Agregar a la configuración
     config.modules.push(moduleId);
     loadModulePermissions(moduleId, moduleName);
     updateModuleCardStatus(moduleId, 'selected');
   } else {
+    // Remover de la configuración
     removeModule(moduleId);
     updateModuleCardStatus(moduleId, 'unselected');
   }
   updateSummary();
 }
 
-
-
-  function loadModulePermissions(moduleId, moduleName) {
-    const config = groupConfigurations[currentGroupId];
-    if (!document.getElementById(`perm_block_${moduleId}`)) {
-      fetch(`/security/get-permissions-by-module/${moduleId}/`)
-        .then(response => response.json())
-        .then(data => {
-          const selectedPerms = config.permissions[moduleId] || [];
-          const permissionBlock = document.createElement('div');
-          permissionBlock.id = `perm_block_${moduleId}`;
-          permissionBlock.classList.add('permissions-block');
-          permissionBlock.innerHTML = `
-            <button class="remove-module-btn" onclick="removeModule(${moduleId})" title="Descartar módulo">×</button>
-            <details open>
-              <summary>${moduleName} (${data.permissions.length} permisos)</summary>
-              <div>
-                ${data.permissions.map(p => `
-                  <label>
-                    <input type="checkbox" id="perm_${moduleId}_${p.id}" ${selectedPerms.includes(p.id) ? 'checked' : ''} onclick="selectPermission(${moduleId}, ${p.id})"> 
-                    ${p.name}
-                  </label>
-                `).join('')}
-              </div>
-            </details>
-          `;
-          document.getElementById('permissionsContainer').appendChild(permissionBlock);
-          updateSummary();
-          scrollToPermissionsContainer();  // 👈 Agrega esto
-        });
-        
-
+// Función para actualizar el estado visual de las tarjetas
+function updateModuleCardStatus(moduleId, status) {
+  const moduleCard = document.querySelector(`#module_${moduleId}`);
+  if (!moduleCard) return;
+  
+  const cardContainer = moduleCard.closest('.module-card');
+  const statusDiv = cardContainer.querySelector('.text-xs');
+  
+  if (status === 'selected') {
+    cardContainer.classList.add('module-selected');
+    cardContainer.classList.remove('module-assigned');
+    
+    // Actualizar mensaje de estado
+    if (statusDiv && !statusDiv.classList.contains('text-red-500')) {
+      statusDiv.className = 'text-xs text-green-600 mt-1';
+      statusDiv.textContent = 'Seleccionado en configuración actual';
+    }
+  } else if (status === 'unselected') {
+    cardContainer.classList.remove('module-selected');
+    
+    // Remover mensaje de selección si existe
+    if (statusDiv && statusDiv.classList.contains('text-green-600')) {
+      statusDiv.remove();
     }
   }
+}
 
-
+function loadModulePermissions(moduleId, moduleName) {
+  const config = groupConfigurations[currentGroupId];
+  if (!document.getElementById(`perm_block_${moduleId}`)) {
+    fetch(`/security/get-permissions-by-module/${moduleId}/`)
+      .then(response => response.json())
+      .then(data => {
+        const selectedPerms = config.permissions[moduleId] || [];
+        const permissionBlock = document.createElement('div');
+        permissionBlock.id = `perm_block_${moduleId}`;
+        permissionBlock.classList.add('permissions-block');
+        permissionBlock.innerHTML = `
+          <button class="remove-module-btn" onclick="removeModule(${moduleId})" title="Descartar módulo">×</button>
+          <details open>
+            <summary>${moduleName} (${data.permissions.length} permisos)</summary>
+            <div>
+              ${data.permissions.map(p => `
+                <label>
+                  <input type="checkbox" id="perm_${moduleId}_${p.id}" ${selectedPerms.includes(p.id) ? 'checked' : ''} onclick="selectPermission(${moduleId}, ${p.id})"> 
+                  ${p.name}
+                </label>
+              `).join('')}
+            </div>
+          </details>
+        `;
+        document.getElementById('permissionsContainer').appendChild(permissionBlock);
+        updateSummary();
+        scrollToPermissionsContainer();
+      });
+  }
+}
 
 function scrollToPermissionsContainer() {
   const container = document.getElementById('permissionsContainer');
@@ -486,65 +486,63 @@ function scrollToPermissionsContainer() {
   }
 }
 
-
-  function selectPermission(moduleId, permissionId) {
-    const config = groupConfigurations[currentGroupId];
-    if (!config.permissions[moduleId]) config.permissions[moduleId] = [];
-    const perms = config.permissions[moduleId];
-    if (perms.includes(permissionId)) {
-      config.permissions[moduleId] = perms.filter(id => id !== permissionId);
-    } else {
-      perms.push(permissionId);
-    }
-    updateSummary();
+function selectPermission(moduleId, permissionId) {
+  const config = groupConfigurations[currentGroupId];
+  if (!config.permissions[moduleId]) config.permissions[moduleId] = [];
+  const perms = config.permissions[moduleId];
+  if (perms.includes(permissionId)) {
+    config.permissions[moduleId] = perms.filter(id => id !== permissionId);
+  } else {
+    perms.push(permissionId);
   }
+  updateSummary();
+}
 
-  function removeModule(moduleId) {
-    const config = groupConfigurations[currentGroupId];
-    config.modules = config.modules.filter(id => id !== moduleId);
-    delete config.permissions[moduleId];
-    
-    // Remover el bloque de permisos
-    const block = document.getElementById(`perm_block_${moduleId}`);
-    if (block) block.remove();
-    
-    // Desmarcar el checkbox del módulo
-    const checkbox = document.getElementById(`module_${moduleId}`);
-    if (checkbox) checkbox.checked = false;
-    
-    updateSummary();
-  }
-
-  function updateSummary() {
-    const allConfigurations = Object.values(groupConfigurations);
-    const configurationsWithModules = allConfigurations.filter(config => config.modules.length > 0);
-    
-    const totalGroups = configurationsWithModules.length;
-    const totalModules = configurationsWithModules.reduce((total, config) => total + config.modules.length, 0);
-    const totalPermissions = configurationsWithModules.reduce((total, config) => 
-      total + Object.values(config.permissions).reduce((perms, permList) => perms + permList.length, 0), 0);
-
-    document.getElementById('resumenGrupos').textContent = totalGroups;
-    document.getElementById('resumenModulos').textContent = totalModules;
-    document.getElementById('resumenTotal').textContent = totalPermissions;
-
-    // Actualizar detalle de grupos
-    const resumenDetalle = document.getElementById('resumenDetalle');
-    if (configurationsWithModules.length > 0) {
-      const detalleHtml = configurationsWithModules.map(config => {
-        const permCount = Object.values(config.permissions).reduce((total, perms) => total + perms.length, 0);
-        return `<span class="inline-block bg-green-200 text-green-800 px-2 py-1 rounded mr-2 mb-1">
-          <strong>${config.group_name}</strong>: ${config.modules.length} módulos, ${permCount} permisos
-        </span>`;
-      }).join('');
-      resumenDetalle.innerHTML = detalleHtml;
-    } else {
-      resumenDetalle.innerHTML = '<span class="text-gray-500 italic">No hay grupos configurados</span>';
-    }
-  }
-
+function removeModule(moduleId) {
+  const config = groupConfigurations[currentGroupId];
+  config.modules = config.modules.filter(id => id !== moduleId);
+  delete config.permissions[moduleId];
   
-  async function guardarConfiguracionFinal() {
+  // Remover el bloque de permisos
+  const block = document.getElementById(`perm_block_${moduleId}`);
+  if (block) block.remove();
+  
+  // Desmarcar el checkbox del módulo
+  const checkbox = document.getElementById(`module_${moduleId}`);
+  if (checkbox) checkbox.checked = false;
+  
+  updateSummary();
+}
+
+function updateSummary() {
+  const allConfigurations = Object.values(groupConfigurations);
+  const configurationsWithModules = allConfigurations.filter(config => config.modules.length > 0);
+  
+  const totalGroups = configurationsWithModules.length;
+  const totalModules = configurationsWithModules.reduce((total, config) => total + config.modules.length, 0);
+  const totalPermissions = configurationsWithModules.reduce((total, config) => 
+    total + Object.values(config.permissions).reduce((perms, permList) => perms + permList.length, 0), 0);
+
+  document.getElementById('resumenGrupos').textContent = totalGroups;
+  document.getElementById('resumenModulos').textContent = totalModules;
+  document.getElementById('resumenTotal').textContent = totalPermissions;
+
+  // Actualizar detalle de grupos
+  const resumenDetalle = document.getElementById('resumenDetalle');
+  if (configurationsWithModules.length > 0) {
+    const detalleHtml = configurationsWithModules.map(config => {
+      const permCount = Object.values(config.permissions).reduce((total, perms) => total + perms.length, 0);
+      return `<span class="inline-block bg-green-200 text-green-800 px-2 py-1 rounded mr-2 mb-1">
+        <strong>${config.group_name}</strong>: ${config.modules.length} módulos, ${permCount} permisos
+      </span>`;
+    }).join('');
+    resumenDetalle.innerHTML = detalleHtml;
+  } else {
+    resumenDetalle.innerHTML = '<span class="text-gray-500 italic">No hay grupos configurados</span>';
+  }
+}
+
+async function guardarConfiguracionFinal() {
   const rawSelections = Object.values(groupConfigurations).filter(config => config.modules.length > 0);
 
   const formattedSelections = [];
@@ -555,7 +553,6 @@ function scrollToPermissionsContainer() {
     config.modules.forEach(moduleId => {
       const permissionIds = config.permissions[moduleId] || [];
 
-      // Evita guardar si no hay permisos seleccionados
       if (permissionIds.length > 0) {
         formattedSelections.push({
           group_id: groupId,
@@ -573,8 +570,8 @@ function scrollToPermissionsContainer() {
 
   const payload = {
     selections: formattedSelections,
-    is_update: false,
-    existing_object_id: null
+    is_update: isUpdateMode,
+    existing_object_id: isUpdateMode ? existingData?.group_id : null
   };
 
   try {
@@ -601,8 +598,6 @@ function scrollToPermissionsContainer() {
   }
 }
 
-
-
 function getCSRFToken() {
   const name = 'csrftoken';
   const cookies = document.cookie.split(';');
@@ -615,27 +610,26 @@ function getCSRFToken() {
   return '';
 }
 
-  // Función para reiniciar la configuración
-  document.getElementById('btnReiniciar').addEventListener('click', function() {
-    if (confirm('¿Estás seguro de que quieres reiniciar toda la configuración?')) {
-      // Limpiar todas las configuraciones
-      groupConfigurations = {};
-      currentGroupId = null;
-      
-      // Limpiar la UI
-      document.querySelectorAll('.group-card').forEach(card => card.classList.remove('selected'));
-      document.getElementById('moduleContainer').innerHTML = '';
-      document.getElementById('permissionsContainer').innerHTML = '';
-      document.getElementById('modulesSection').style.display = 'none';
-      document.getElementById('permissionsSection').style.display = 'none';
-      
-      // Actualizar resumen
-      updateSummary();
-    }
-  });
+// Función para reiniciar la configuración
+document.getElementById('btnReiniciar').addEventListener('click', function() {
+  if (confirm('¿Estás seguro de que quieres reiniciar toda la configuración?')) {
+    // Limpiar todas las configuraciones
+    groupConfigurations = {};
+    currentGroupId = null;
+    
+    // Limpiar la UI
+    document.querySelectorAll('.group-card').forEach(card => card.classList.remove('selected'));
+    document.getElementById('moduleContainer').innerHTML = '';
+    document.getElementById('permissionsContainer').innerHTML = '';
+    document.getElementById('modulesSection').style.display = 'none';
+    document.getElementById('permissionsSection').style.display = 'none';
+    
+    // Actualizar resumen
+    updateSummary();
+  }
+});
 </script>
 {% endblock %}
-
 
 
 

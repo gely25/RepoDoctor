@@ -5,7 +5,7 @@
 {% include 'fragments/messages.html' %}
 
 <section class="dark:bg-principal mt-2">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="sm:pt-8 lg:pt-4 text-center">
             <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
                 {{ title1 }}
@@ -15,26 +15,35 @@
         <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6 dark:text-white">
             {% csrf_token %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Paciente -->
                 <div>
-                    {{ form.paciente.label_tag }} {{ form.paciente }}
+                    <label class="block font-semibold mb-1">{{ form.paciente.label }}</label>
+                    {{ form.paciente }}
                     {% for error in form.paciente.errors %}
                         <div class="text-red-500 text-sm">{{ error }}</div>
                     {% endfor %}
                 </div>
+
+                <!-- Imagen -->
                 <div>
-                    {{ form.imagen.label_tag }} {{ form.imagen }}
+                    <label class="block font-semibold mb-1">{{ form.imagen.label }}</label>
+                    {{ form.imagen }}
                     {% for error in form.imagen.errors %}
                         <div class="text-red-500 text-sm">{{ error }}</div>
                     {% endfor %}
                 </div>
+
+                <!-- Descripción -->
                 <div class="md:col-span-2">
-                    {{ form.descripcion.label_tag }} {{ form.descripcion }}
+                    <label class="block font-semibold mb-1">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
                     {% for error in form.descripcion.errors %}
                         <div class="text-red-500 text-sm">{{ error }}</div>
                     {% endfor %}
                 </div>
             </div>
 
+            <!-- Botones -->
             <div class="mt-6 flex justify-center space-x-4">
                 <a href="{% url 'core:fotopaciente_list' %}" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded">
                     <i class="fa-solid fa-arrow-left mr-2"></i> Cancelar

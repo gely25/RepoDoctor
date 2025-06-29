@@ -1,35 +1,50 @@
 from django import forms
-from django.forms import ModelForm
 from applications.core.models import FotoPaciente
 
-class FotoPacienteForm(ModelForm):
+class FotoPacienteForm(forms.ModelForm):
     class Meta:
         model = FotoPaciente
-        fields = ["paciente", "imagen", "descripcion"]
-
-        widgets = {
-            "paciente": forms.Select(attrs={
-                "id": "id_paciente",
-                "class": "form-control",
-            }),
-            "imagen": forms.ClearableFileInput(attrs={
-                "id": "id_imagen",
-                "class": "form-control-file",
-            }),
-            "descripcion": forms.Textarea(attrs={
-                "placeholder": "Ingrese una descripción (opcional)",
-                "id": "id_descripcion",
-                "class": "form-control",
-                "rows": 3,
-            }),
-        }
-
+        fields = ['paciente', 'imagen', 'descripcion']
         labels = {
-            "paciente": "Paciente",
-            "imagen": "Imagen",
-            "descripcion": "Descripción",
+            'paciente': 'Paciente',
+            'imagen': 'Imagen del Paciente',
+            'descripcion': 'Descripción',
+        }
+        widgets = {
+            'paciente': forms.Select(
+                attrs={
+                    'class': 'form-control rounded-md dark:bg-gray-800 dark:text-white',
+                }
+            ),
+            'imagen': forms.ClearableFileInput(
+                attrs={
+                    'class': 'form-control-file mt-2 dark:bg-gray-800 dark:text-white',
+                    'accept': 'image/*',
+                }
+            ),
+            'descripcion': forms.Textarea(
+                attrs={
+                    'class': 'form-control rounded-md dark:bg-gray-800 dark:text-white',
+                    'rows': 3,
+                    'placeholder': 'Descripción opcional de la imagen...',
+                }
+            ),
+        }
+        error_messages = {
+            'paciente': {
+                'required': 'Debe seleccionar un paciente.',
+            },
+            'imagen': {
+                'required': 'Debe subir una imagen.',
+                'invalid': 'El archivo subido no es una imagen válida.',
+            },
         }
 
-    def clean_descripcion(self):
-        descripcion = self.cleaned_data.get("descripcion")
-        return descripcion.capitalize() if descripcion else ""
+    def clean_imagen(self):
+        imagen = self.cleaned_data.get('imagen')
+        if imagen:
+            if imagen.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("La imagen no debe superar los 5MB.")
+            if not imagen.content_type.startswith("image/"):
+                raise forms.ValidationError("El archivo debe ser una imagen válida.")
+        return imagen

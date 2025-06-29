@@ -33,17 +33,17 @@
                         <div class="bg-gray-100 dark:bg-principal rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
                             <i class="fa-solid fa-money-bill-trend-up text-3xl text-gray-400"></i>
                         </div>
-                        <h2 class="dark:text-blue-300 text-2xl font-Pacifico">Vista previa de gasto</h2>
+                        <h2 class="dark:text-blue-300 text-2xl font-Pacifico">Registrar Gasto</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Campo tipo -->
+                        <!-- Campo tipo_gasto -->
                         <div>
-                            <label for="id_tipo" class="block text-left text-lg font-bold dark:text-blue-300">
-                                {{ form.tipo.label }} <span class="text-red-500">*</span>
+                            <label for="id_tipo_gasto" class="block text-left text-lg font-bold dark:text-blue-300">
+                                {{ form.tipo_gasto.label }} <span class="text-red-500">*</span>
                             </label>
-                            {{ form.tipo }}
-                            {% for error in form.tipo.errors %}
+                            {{ form.tipo_gasto }}
+                            {% for error in form.tipo_gasto.errors %}
                                 <p class="text-red-500 text-sm">{{ error }}</p>
                             {% endfor %}
                         </div>
@@ -59,24 +59,24 @@
                             {% endfor %}
                         </div>
 
-                        <!-- Campo monto -->
+                        <!-- Campo valor -->
                         <div>
-                            <label for="id_monto" class="block text-left text-lg font-bold dark:text-blue-300">
-                                {{ form.monto.label }} <span class="text-red-500">*</span>
+                            <label for="id_valor" class="block text-left text-lg font-bold dark:text-blue-300">
+                                {{ form.valor.label }} <span class="text-red-500">*</span>
                             </label>
-                            {{ form.monto }}
-                            {% for error in form.monto.errors %}
+                            {{ form.valor }}
+                            {% for error in form.valor.errors %}
                                 <p class="text-red-500 text-sm">{{ error }}</p>
                             {% endfor %}
                         </div>
 
-                        <!-- Campo descripción (ancho completo) -->
+                        <!-- Campo observación -->
                         <div class="md:col-span-2">
-                            <label for="id_descripcion" class="block text-left text-lg font-bold dark:text-blue-300">
-                                {{ form.descripcion.label }} <span class="text-red-500">*</span>
+                            <label for="id_observacion" class="block text-left text-lg font-bold dark:text-blue-300">
+                                {{ form.observacion.label }}
                             </label>
-                            {{ form.descripcion }}
-                            {% for error in form.descripcion.errors %}
+                            {{ form.observacion }}
+                            {% for error in form.observacion.errors %}
                                 <p class="text-red-500 text-sm">{{ error }}</p>
                             {% endfor %}
                         </div>

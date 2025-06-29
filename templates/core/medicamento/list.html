@@ -48,9 +48,9 @@
                         <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
                             <td class="px-6 py-4">{{ item.id }}</td>
                             <td class="px-6 py-4">{{ item.nombre }}</td>
-                            <td class="px-6 py-4">{{ item.marca }}</td>
+                            <td class="px-6 py-4">{{ item.marca_medicamento }}</td>
                             <td class="px-6 py-4">{{ item.tipo }}</td>
-                            <td class="px-6 py-4">{{ item.stock }}</td>
+                            <td class="px-6 py-4">{{ item.cantidad }}</td>
                             <td class="px-6 py-4">
                                 {% if permissions.change_medicamento %}
                                 <a href="{% url 'core:medicamento_update' item.id %}" class="text-blue-600 dark:text-blue-500 hover:text-blue-800 mx-1">
@@ -67,6 +67,7 @@
                         </tr>
                         {% endfor %}
                     </tbody>
+
                 </table>
             </div>
 

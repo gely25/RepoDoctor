@@ -38,27 +38,6 @@ class GroupModulePermissionListView(PermissionMixin, ListViewMixin, ListView):
 
 
 
-# class GroupModulePermissionCreateView(PermissionMixin, CreateViewMixin, CreateView):
-#     model = GroupModulePermission
-#     template_name = 'security/group_module_permissions/form.html'
-#     form_class = GroupModulePermissionForm
-#     success_url = reverse_lazy('security:group_module_permission_list')
-#     permission_required = 'add_groupmodulepermission'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title'] = 'Asignar Permisos Múltiples'
-#         context['title1'] = 'Asignar Permisos Múltiples'
-#         context['grabar'] = 'Guardar Permisos'
-#         context['back_url'] = self.success_url
-#         context['groups'] = Group.objects.all().order_by('name')
-#         context['modules'] = Module.objects.all().order_by('name')
-#         return context
-
-#     def form_valid(self, form):
-#         messages.success(self.request, "Permisos de grupo registrados con éxito.")
-#         return super().form_valid(form)
-
 
 
 class GroupModulePermissionCreateView(PermissionMixin, CreateViewMixin, CreateView):
@@ -551,3 +530,5 @@ class GetPermissionsByModuleView(View):
 
 #         except Exception as e:
 #             return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+
+

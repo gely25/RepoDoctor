@@ -61,4 +61,5 @@ urlpatterns = [
     # Autenticación
     path('signin/', signin, name='signin'),
     path('logout/', signout, name='signout'),
+    
 ]

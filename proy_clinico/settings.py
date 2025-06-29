@@ -64,6 +64,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'applications.security.middlewares.SuperuserGroupSyncMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
@@ -101,7 +103,7 @@ WSGI_APPLICATION = 'proy_clinico.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'doctors_pro',
+        'NAME': 'bd_final',
         'USER': 'postgres',
         'PASSWORD': 'basedatos25',
         'HOST': 'localhost',  # o la IP del servidor de base de datos
