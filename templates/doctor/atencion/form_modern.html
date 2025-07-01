@@ -1,247 +1,559 @@
 {% extends 'home.html' %}
-{% load static %}
 <title>{% block title %}{{ title }}{% endblock %}</title>
-
+{% load static %}
 {% block content %}
-<section class="bg-white dark:bg-principal">
-  <div class="text-center pt-6">
-    <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">{{ title1 }}</h1>
-  </div>
-
-  <form method="post" enctype="multipart/form-data" autocomplete="off" class="mx-auto max-w-4xl py-8">
-    {% csrf_token %}
-    <div class="bg-white dark:bg-secundario rounded-3xl p-6 shadow-md">
-
-      {% if form.non_field_errors %}
-      <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6">
-        <h3 class="text-red-800 dark:text-red-200 font-medium">Errores:</h3>
-        <ul class="list-disc list-inside text-red-700 dark:text-red-300">
-          {% for error in form.non_field_errors %}
-          <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="mb-4">
-          <label for="{{ form.paciente.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.paciente.label }}{% if form.paciente.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.paciente }}
-          {% if form.paciente.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.paciente.help_text }}</p>
-          {% endif %}
-          {% for error in form.paciente.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
+<section class="dark:bg-principal">
+    <div class="text-center" data-aos="fade" data-aos-delay="200">
+        <div class="sm:pt-28 lg:pt-4">
+            <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
+                {{ title1 }}
+            </h1>
         </div>
 
-        <div class="mb-4">
-          <label for="{{ form.presion_arterial.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.presion_arterial.label }}{% if form.presion_arterial.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.presion_arterial }}
-          {% if form.presion_arterial.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.presion_arterial.help_text }}</p>
-          {% endif %}
-          {% for error in form.presion_arterial.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
+        {% if form.non_field_errors %}
+        <div class="mx-4 lg:mx-20 mb-6" data-aos="fade-up">
+            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg max-w-4xl mx-auto">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-red-800 dark:text-red-200 font-medium">
+                            Se encontraron errores en el formulario:
+                        </h3>
+                        <div class="mt-2 text-red-700 dark:text-red-300">
+                            <ul class="list-disc list-inside space-y-1">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endif %}
 
-        <div class="mb-4">
-          <label for="{{ form.pulso.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.pulso.label }}{% if form.pulso.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.pulso }}
-          {% if form.pulso.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.pulso.help_text }}</p>
-          {% endif %}
-          {% for error in form.pulso.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
+        <form method="post" enctype="multipart/form-data" autocomplete="off" class="space-y-6 py-4">
+            <div class="mx-4 lg:mx-20" data-aos="fade">
+                <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto"
+                    data-aos="fade-up" data-aos-delay="200">
+                    {% csrf_token %}
 
-        <div class="mb-4">
-          <label for="{{ form.temperatura.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.temperatura.label }}{% if form.temperatura.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.temperatura }}
-          {% if form.temperatura.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.temperatura.help_text }}</p>
-          {% endif %}
-          {% for error in form.temperatura.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.paciente.errors %}has-error{% endif %}">
+                                <label for="{{ form.paciente.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.paciente.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.paciente.label }}
+                                    {% if form.paciente.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.paciente }}
+                                    {% if form.paciente.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.paciente.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.paciente.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.paciente.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.paciente.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.presion_arterial.errors %}has-error{% endif %}">
+                                <label for="{{ form.presion_arterial.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.presion_arterial.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.presion_arterial.label }}
+                                    {% if form.presion_arterial.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.presion_arterial }}
+                                    {% if form.presion_arterial.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.presion_arterial.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.presion_arterial.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.presion_arterial.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.presion_arterial.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.pulso.errors %}has-error{% endif %}">
+                                <label for="{{ form.pulso.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.pulso.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.pulso.label }}
+                                    {% if form.pulso.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.pulso }}
+                                    {% if form.pulso.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.pulso.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.pulso.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.pulso.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.pulso.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.temperatura.errors %}has-error{% endif %}">
+                                <label for="{{ form.temperatura.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.temperatura.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.temperatura.label }}
+                                    {% if form.temperatura.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.temperatura }}
+                                    {% if form.temperatura.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.temperatura.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.temperatura.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.temperatura.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.temperatura.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.frecuencia_respiratoria.errors %}has-error{% endif %}">
+                                <label for="{{ form.frecuencia_respiratoria.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.frecuencia_respiratoria.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.frecuencia_respiratoria.label }}
+                                    {% if form.frecuencia_respiratoria.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.frecuencia_respiratoria }}
+                                    {% if form.frecuencia_respiratoria.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.frecuencia_respiratoria.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.frecuencia_respiratoria.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.frecuencia_respiratoria.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.frecuencia_respiratoria.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.saturacion_oxigeno.errors %}has-error{% endif %}">
+                                <label for="{{ form.saturacion_oxigeno.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.saturacion_oxigeno.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.saturacion_oxigeno.label }}
+                                    {% if form.saturacion_oxigeno.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.saturacion_oxigeno }}
+                                    {% if form.saturacion_oxigeno.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.saturacion_oxigeno.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.saturacion_oxigeno.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.saturacion_oxigeno.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.saturacion_oxigeno.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.peso.errors %}has-error{% endif %}">
+                                <label for="{{ form.peso.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.peso.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.peso.label }}
+                                    {% if form.peso.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.peso }}
+                                    {% if form.peso.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.peso.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.peso.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.peso.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.peso.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.altura.errors %}has-error{% endif %}">
+                                <label for="{{ form.altura.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.altura.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.altura.label }}
+                                    {% if form.altura.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.altura }}
+                                    {% if form.altura.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.altura.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.altura.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.altura.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.altura.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.motivo_consulta.errors %}has-error{% endif %}">
+                                <label for="{{ form.motivo_consulta.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.motivo_consulta.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.motivo_consulta.label }}
+                                    {% if form.motivo_consulta.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.motivo_consulta }}
+                                    {% if form.motivo_consulta.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.motivo_consulta.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.motivo_consulta.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.motivo_consulta.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.motivo_consulta.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.sintomas.errors %}has-error{% endif %}">
+                                <label for="{{ form.sintomas.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.sintomas.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.sintomas.label }}
+                                    {% if form.sintomas.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.sintomas }}
+                                    {% if form.sintomas.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.sintomas.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.sintomas.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.sintomas.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.sintomas.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.tratamiento.errors %}has-error{% endif %}">
+                                <label for="{{ form.tratamiento.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.tratamiento.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.tratamiento.label }}
+                                    {% if form.tratamiento.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.tratamiento }}
+                                    {% if form.tratamiento.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.tratamiento.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.tratamiento.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.tratamiento.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.tratamiento.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.diagnostico.errors %}has-error{% endif %}">
+                                <label for="{{ form.diagnostico.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.diagnostico.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.diagnostico.label }}
+                                    {% if form.diagnostico.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.diagnostico }}
+                                    {% if form.diagnostico.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.diagnostico.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.diagnostico.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.diagnostico.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.diagnostico.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.examen_fisico.errors %}has-error{% endif %}">
+                                <label for="{{ form.examen_fisico.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.examen_fisico.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.examen_fisico.label }}
+                                    {% if form.examen_fisico.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.examen_fisico }}
+                                    {% if form.examen_fisico.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.examen_fisico.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.examen_fisico.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.examen_fisico.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.examen_fisico.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.examenes_enviados.errors %}has-error{% endif %}">
+                                <label for="{{ form.examenes_enviados.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.examenes_enviados.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.examenes_enviados.label }}
+                                    {% if form.examenes_enviados.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.examenes_enviados }}
+                                    {% if form.examenes_enviados.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.examenes_enviados.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.examenes_enviados.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.examenes_enviados.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.examenes_enviados.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 lg:col-span-3 space-y-6">
+                            <div class="field-container {% if form.comentario_adicional.errors %}has-error{% endif %}">
+                                <label for="{{ form.comentario_adicional.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.comentario_adicional.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.comentario_adicional.label }}
+                                    {% if form.comentario_adicional.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.comentario_adicional }}
+                                    {% if form.comentario_adicional.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.comentario_adicional.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.comentario_adicional.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.comentario_adicional.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.comentario_adicional.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="field-container {% if form.es_control.errors %}has-error{% endif %}">
+                                <label for="{{ form.es_control.id_for_label }}"
+                                    class="font-black uppercase text-lg block mb-2
+                                           {% if form.es_control.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                    {{ form.es_control.label }}
+                                    {% if form.es_control.field.required %}<span class="text-red-500">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ form.es_control }}
+                                    {% if form.es_control.help_text %}
+                                    <small class="text-gray-500 dark:text-gray-400 block mt-1">{{ form.es_control.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.es_control.errors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.es_control.errors %}
+                                <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    {% for error in form.es_control.errors %}
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="mb-4">
-          <label for="{{ form.frecuencia_respiratoria.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.frecuencia_respiratoria.label }}{% if form.frecuencia_respiratoria.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.frecuencia_respiratoria }}
-          {% if form.frecuencia_respiratoria.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.frecuencia_respiratoria.help_text }}</p>
-          {% endif %}
-          {% for error in form.frecuencia_respiratoria.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4">
-          <label for="{{ form.saturacion_oxigeno.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.saturacion_oxigeno.label }}{% if form.saturacion_oxigeno.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.saturacion_oxigeno }}
-          {% if form.saturacion_oxigeno.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.saturacion_oxigeno.help_text }}</p>
-          {% endif %}
-          {% for error in form.saturacion_oxigeno.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4">
-          <label for="{{ form.peso.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.peso.label }}{% if form.peso.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.peso }}
-          {% if form.peso.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.peso.help_text }}</p>
-          {% endif %}
-          {% for error in form.peso.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4">
-          <label for="{{ form.altura.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.altura.label }}{% if form.altura.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.altura }}
-          {% if form.altura.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.altura.help_text }}</p>
-          {% endif %}
-          {% for error in form.altura.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.motivo_consulta.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.motivo_consulta.label }}{% if form.motivo_consulta.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.motivo_consulta }}
-          {% if form.motivo_consulta.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.motivo_consulta.help_text }}</p>
-          {% endif %}
-          {% for error in form.motivo_consulta.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.sintomas.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.sintomas.label }}{% if form.sintomas.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.sintomas }}
-          {% if form.sintomas.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.sintomas.help_text }}</p>
-          {% endif %}
-          {% for error in form.sintomas.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.tratamiento.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.tratamiento.label }}{% if form.tratamiento.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.tratamiento }}
-          {% if form.tratamiento.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.tratamiento.help_text }}</p>
-          {% endif %}
-          {% for error in form.tratamiento.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4">
-          <label for="{{ form.diagnostico.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.diagnostico.label }}{% if form.diagnostico.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.diagnostico }}
-          {% if form.diagnostico.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.diagnostico.help_text }}</p>
-          {% endif %}
-          {% for error in form.diagnostico.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.examen_fisico.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.examen_fisico.label }}{% if form.examen_fisico.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.examen_fisico }}
-          {% if form.examen_fisico.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.examen_fisico.help_text }}</p>
-          {% endif %}
-          {% for error in form.examen_fisico.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.examenes_enviados.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.examenes_enviados.label }}{% if form.examenes_enviados.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.examenes_enviados }}
-          {% if form.examenes_enviados.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.examenes_enviados.help_text }}</p>
-          {% endif %}
-          {% for error in form.examenes_enviados.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4 md:col-span-2 lg:col-span-3">
-          <label for="{{ form.comentario_adicional.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.comentario_adicional.label }}{% if form.comentario_adicional.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.comentario_adicional }}
-          {% if form.comentario_adicional.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.comentario_adicional.help_text }}</p>
-          {% endif %}
-          {% for error in form.comentario_adicional.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="mb-4">
-          <label for="{{ form.es_control.id_for_label }}" class="font-bold text-blue-700 block mb-1">
-            {{ form.es_control.label }}{% if form.es_control.field.required %}<span class="text-red-500">*</span>{% endif %}
-          </label>
-          {{ form.es_control }}
-          {% if form.es_control.help_text %}
-          <p class="text-gray-500 text-xs mt-1">{{ form.es_control.help_text }}</p>
-          {% endif %}
-          {% for error in form.es_control.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="flex justify-center gap-6 mt-8">
-        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-6 rounded shadow-md transition">
-          <i class="fa fa-save mr-2"></i> Guardar
-        </button>
-        <a href="{{ back_url }}" class="bg-red-700 hover:bg-red-800 text-white py-2 px-6 rounded shadow-md transition">
-          <i class="fa fa-times mr-2"></i> Cancelar
-        </a>
-      </div>
+                    <div class="flex flex-col md:flex-row justify-center items-center mt-8 space-y-3 md:space-y-0 md:space-x-8">
+                        <button type="submit"
+                            class="w-full md:w-auto bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
+                            <i class="fa-solid fa-save mr-2"></i>Guardar
+                        </button>
+                        <a class="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+                            href="{{ back_url }}">
+                            <i class="fa-solid fa-xmark mr-2"></i>Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-  </form>
 </section>
 {% endblock %}
+%}
+
