@@ -24,7 +24,7 @@ class AtencionListView(PermissionMixin, ListViewMixin, ListView):
 class AtencionCreateView(PermissionMixin, CreateViewMixin, CreateView):
     model = Atencion
     form_class = AtencionForm
-    template_name = 'doctor/atencion/form.html'
+    template_name = 'doctor/atencion/form_modern.html'
     success_url = reverse_lazy('doctor:atencion_list')
     permission_required = 'doctor.add_atencion'
     title = 'Nueva Atención Médica'
@@ -39,7 +39,7 @@ class AtencionCreateView(PermissionMixin, CreateViewMixin, CreateView):
 class AtencionUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     model = Atencion
     form_class = AtencionForm
-    template_name = 'doctor/atencion/form.html'
+    template_name = 'doctor/atencion/form_modern.html'
     success_url = reverse_lazy('doctor:atencion_list')
     permission_required = 'doctor.change_atencion'
     title = 'Editar Atención Médica'
