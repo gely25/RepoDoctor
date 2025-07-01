@@ -1,0 +1,247 @@
+{% extends 'home.html' %}
+{% load static %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+
+{% block content %}
+<section class="bg-white dark:bg-principal">
+  <div class="text-center pt-6">
+    <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">{{ title1 }}</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" autocomplete="off" class="mx-auto max-w-4xl py-8">
+    {% csrf_token %}
+    <div class="bg-white dark:bg-secundario rounded-3xl p-6 shadow-md">
+
+      {% if form.non_field_errors %}
+      <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6">
+        <h3 class="text-red-800 dark:text-red-200 font-medium">Errores:</h3>
+        <ul class="list-disc list-inside text-red-700 dark:text-red-300">
+          {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="mb-4">
+          <label for="{{ form.paciente.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.paciente.label }}{% if form.paciente.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.paciente }}
+          {% if form.paciente.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.paciente.help_text }}</p>
+          {% endif %}
+          {% for error in form.paciente.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.presion_arterial.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.presion_arterial.label }}{% if form.presion_arterial.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.presion_arterial }}
+          {% if form.presion_arterial.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.presion_arterial.help_text }}</p>
+          {% endif %}
+          {% for error in form.presion_arterial.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.pulso.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.pulso.label }}{% if form.pulso.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.pulso }}
+          {% if form.pulso.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.pulso.help_text }}</p>
+          {% endif %}
+          {% for error in form.pulso.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.temperatura.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.temperatura.label }}{% if form.temperatura.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.temperatura }}
+          {% if form.temperatura.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.temperatura.help_text }}</p>
+          {% endif %}
+          {% for error in form.temperatura.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.frecuencia_respiratoria.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.frecuencia_respiratoria.label }}{% if form.frecuencia_respiratoria.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.frecuencia_respiratoria }}
+          {% if form.frecuencia_respiratoria.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.frecuencia_respiratoria.help_text }}</p>
+          {% endif %}
+          {% for error in form.frecuencia_respiratoria.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.saturacion_oxigeno.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.saturacion_oxigeno.label }}{% if form.saturacion_oxigeno.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.saturacion_oxigeno }}
+          {% if form.saturacion_oxigeno.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.saturacion_oxigeno.help_text }}</p>
+          {% endif %}
+          {% for error in form.saturacion_oxigeno.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.peso.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.peso.label }}{% if form.peso.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.peso }}
+          {% if form.peso.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.peso.help_text }}</p>
+          {% endif %}
+          {% for error in form.peso.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.altura.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.altura.label }}{% if form.altura.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.altura }}
+          {% if form.altura.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.altura.help_text }}</p>
+          {% endif %}
+          {% for error in form.altura.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.motivo_consulta.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.motivo_consulta.label }}{% if form.motivo_consulta.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.motivo_consulta }}
+          {% if form.motivo_consulta.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.motivo_consulta.help_text }}</p>
+          {% endif %}
+          {% for error in form.motivo_consulta.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.sintomas.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.sintomas.label }}{% if form.sintomas.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.sintomas }}
+          {% if form.sintomas.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.sintomas.help_text }}</p>
+          {% endif %}
+          {% for error in form.sintomas.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.tratamiento.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.tratamiento.label }}{% if form.tratamiento.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.tratamiento }}
+          {% if form.tratamiento.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.tratamiento.help_text }}</p>
+          {% endif %}
+          {% for error in form.tratamiento.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.diagnostico.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.diagnostico.label }}{% if form.diagnostico.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.diagnostico }}
+          {% if form.diagnostico.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.diagnostico.help_text }}</p>
+          {% endif %}
+          {% for error in form.diagnostico.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.examen_fisico.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.examen_fisico.label }}{% if form.examen_fisico.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.examen_fisico }}
+          {% if form.examen_fisico.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.examen_fisico.help_text }}</p>
+          {% endif %}
+          {% for error in form.examen_fisico.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.examenes_enviados.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.examenes_enviados.label }}{% if form.examenes_enviados.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.examenes_enviados }}
+          {% if form.examenes_enviados.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.examenes_enviados.help_text }}</p>
+          {% endif %}
+          {% for error in form.examenes_enviados.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4 md:col-span-2 lg:col-span-3">
+          <label for="{{ form.comentario_adicional.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.comentario_adicional.label }}{% if form.comentario_adicional.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.comentario_adicional }}
+          {% if form.comentario_adicional.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.comentario_adicional.help_text }}</p>
+          {% endif %}
+          {% for error in form.comentario_adicional.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.es_control.id_for_label }}" class="font-bold text-blue-700 block mb-1">
+            {{ form.es_control.label }}{% if form.es_control.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.es_control }}
+          {% if form.es_control.help_text %}
+          <p class="text-gray-500 text-xs mt-1">{{ form.es_control.help_text }}</p>
+          {% endif %}
+          {% for error in form.es_control.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-6 mt-8">
+        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-6 rounded shadow-md transition">
+          <i class="fa fa-save mr-2"></i> Guardar
+        </button>
+        <a href="{{ back_url }}" class="bg-red-700 hover:bg-red-800 text-white py-2 px-6 rounded shadow-md transition">
+          <i class="fa fa-times mr-2"></i> Cancelar
+        </a>
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}
