@@ -79,25 +79,24 @@ class PermissionMixin(object):
     permission_required = ''
 
     @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         try:
             user = request.user
-            user_session=UserGroupSession(request)
+            user_session = UserGroupSession(request)
             user_session.set_group_session()
 
             if 'group_id' not in request.session:
                 return redirect('home')
 
             if user.is_superuser:
-                return super().get(request, *args, **kwargs)
+                return super().dispatch(request, *args, **kwargs)
 
-           
             group = user_session.get_group_session()
-            permissions = self._get_permissions_to_validate() 
+            permissions = self._get_permissions_to_validate()
             print("permissions", permissions)
             if not permissions.__len__():
                 print("entro permisos vacios")
-                return super().get(request, *args, **kwargs)
+                return super().dispatch(request, *args, **kwargs)
 
             if not group.module_permissions.filter(
                     permissions__codename__in=permissions
@@ -106,7 +105,7 @@ class PermissionMixin(object):
                 messages.error(request, 'No tiene permiso para ingresar a este módulo')
                 return redirect('home')
 
-            return super().get(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
 
         except Exception as ex:
             messages.error(
